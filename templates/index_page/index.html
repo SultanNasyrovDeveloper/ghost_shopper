@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load staticfiles %}
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="{{ index_page.keywords }}">
+    <meta name="description" content="{{ index_page.description }}">
+
+    <title>{{ index_page.title }}</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'index/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'index/vendor/fontawesome-free/css/all.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="{% static 'index/vendor/simple-line-icons/css/simple-line-icons.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'index/css/stylish-portfolio.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'index/css/index.css' %}">
+
+</head>
+
+<body id="page-top">
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="{% url 'index_page:index' %}">
+        {% if index_page.logo %}
+            <img src="{{ index_page.logo.url }}" alt="Логотип" class="img-fluid">
+        {% else %}
+            Логотип
+        {% endif %}
+
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link font-weight-bold">{{ index_page.phone_number }}</a>
+            <a class="nav-item nav-link font-weight-bold">{{ index_page.email }}</a>
+        </div>
+
+        <div class="navbar-nav ml-auto">
+            <a class="nav-item nav-link active" href="{% url 'auth:login' %}">Войти</a>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Header -->
+<header class="masthead d-flex header-container">
+    <div class="header-content">
+        <div class="header-layout">
+            {% if index_page.header_background %}
+                <img src="{{ index_page.header_background.url }}" alt="">
+            {% else %}
+                <img src="{% static 'assets/images/abstract-painting-art-artistic-1729951.jpg' %}" alt="">
+            {% endif %}
+
+        </div>
+        <div class="tagline header-layout">
+            <div class="container text-center my-auto">
+                <h1 class="mb-1">{{ index_page.header_tagline }}</h1>
+                <h3 class="mb-5">
+                    <em>{{ index_page.header_subtagline }}</em>
+                </h3>
+                <div>
+                    <a class="btn btn-light btn-xl" href="{% url 'auth:signup_performer' %}">Стать тайным покупателем</a>
+                    <button class="btn btn-dark btn-xl" data-toggle="modal" data-target="#callbackform">Заказать аудит</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay"></div>
+</header>
+
+
+<!-- About -->
+<section class="content-section bg-light" id="about">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h2>Основные объекты нашего аудита</h2>
+                <p class="lead mb-5">автосалоны, сервисные центры, банковские отделения, кассы, HR-отделы, детские развлекательные центры</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ADVANTAGES -->
+<section class="content-section bg-primary text-white text-center" id="services">
+    <div class="container">
+        <div class="content-section-heading">
+            <h3 class="text-secondary mb-0">компаниям</h3>
+            <h2 class="mb-5">Преимущества для бизнеса</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 mb-5">
+                <span class="service-icon rounded-circle mx-auto mb-3">
+                    <i class="icon-eye"></i>
+                </span>
+                <p class="text-faded mb-0">Взгляд на компанию глазами клиента</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <span class="service-icon rounded-circle mx-auto mb-3">
+                    <i class="icon-wrench"></i>
+                </span>
+                <p class="text-faded mb-0">Инструмент усовершенствования бизнес-процессов и качества обслуживания</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <span class="service-icon rounded-circle mx-auto mb-3">
+                    <i class="icon-calendar"></i>
+                </span>
+                <p class="text-faded mb-0">Мотивационная система - на основе регулярного аудита качества работы;</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <span class="service-icon rounded-circle mx-auto mb-3">
+                    <i class="icon-graph"></i>
+                </span>
+                <p class="text-faded mb-0">Инструмент постоянной дополнительной мотивации</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <span class="service-icon rounded-circle mx-auto mb-3">
+                    <i class="icon-calculator"></i>
+                </span>
+                <p class="text-faded mb-0">Сбор статистической информации об изменениях в области качества услуг/товаров</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <span class="service-icon rounded-circle mx-auto mb-3">
+                    <i class="icon-people"></i>
+                </span>
+                <p class="text-faded mb-0">Повышение лояльности клиентов</p>
+            </div>
+        </div>
+    </div>
+</section><!-- ADVANTAGES -->
+
+
+<!-- WORK STEPS -->
+<section class="content-section">
+    <div class="container text-center">
+        <div class="content-section-heading">
+            <h2 class="mb-5">Этапы работы</h2>
+        </div>
+        <ul class="timeline">
+            <li>
+                <div class="timeline-badge primary">1</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Определение цели и задач аудита</h4>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-inverted">
+                <div class="timeline-badge primary">2</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Формирование чек-листа на основе стандартов качества обслуживания компании</h4>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="timeline-badge primary">3</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Определение портрета тайного покупателя, сценария и легенды проверки</h4>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-inverted">
+                <div class="timeline-badge primary">4</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Подбор кандидатов на роль тайного покупателя</h4>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="timeline-badge primary">5</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Инструктаж тайного покупателя</h4>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-inverted">
+                <div class="timeline-badge primary">6</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Совершение визита/звонка</h4>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="timeline-badge primary">7</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Формирование отчета (чек-лист, аудио, фото, документы)</h4>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-inverted">
+                <div class="timeline-badge primary">8</div>
+                <div class="timeline-panel">
+                    <div class="timeline-heading">
+                        <h4 class="timeline-title">Анализ проведенной работы, корректировки чек-листа, сценария, легенды, в случае необходимсти</h4>
+                    </div>
+                </div>
+            </li>
+            <li class="timeline-inverted">
+                <div class="timeline-badge success"><i class="icon-thumbs-up2"></i></div>
+            </li>
+        </ul>
+    </div>
+</section><!-- WORK STEPS -->
+
+
+<!-- FACTS -->
+<section class="content-section text-center bg-light" id="services">
+    <div class="container">
+        <div class="content-section-heading">
+            <h3 class="text-secondary mb-0">в цифрах</h3>
+            <h2 class="mb-5">О компании</h2>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-lg-2 col-md-2 mb-4">
+                <span class="service-icon rounded-circle mx-auto mb-3">5</span>
+                <h4><strong>лет аудита</strong></h4>
+            </div>
+            <div class="col-lg-2 col-md-2 mb-4">
+                <span class="service-icon rounded-circle mx-auto mb-3">12</span>
+                <h4><strong>городов</strong></h4>
+            </div>
+            <div class="col-lg-2 col-md-2 mb-4">
+                <span class="service-icon rounded-circle mx-auto mb-3">56</span>
+                <h4><strong>компаний-заказчиков</strong></h4>
+            </div>
+            <div class="col-lg-2 col-md-2 mb-4">
+                <span class="service-icon rounded-circle mx-auto mb-3">>2500</span>
+                <h4><strong>тайных покпателей</strong></h4>
+            </div>
+            <div class="col-lg-2 col-md-2 mb-4">
+                <span class="service-icon rounded-circle mx-auto mb-3">>5000</span>
+                <h4><strong>проведенных проверок</strong></h4>
+            </div>
+        </div>
+    </div>
+</section><!-- FACTS -->
+
+
+<!-- Portfolio -->
+<section class="content-section" id="portfolio">
+    <div class="container">
+        <div class="content-section-heading text-center">
+            <h3 class="text-secondary mb-0">Portfolio</h3>
+            <h2 class="mb-5">Наши преимущества</h2>
+        </div>
+        <div class="row no-gutters">
+            <div class="col-lg-6 p-5">
+                <div class="header mt-5">
+                    <h3>Качество</h3>
+                </div>
+                <p class="mb-3">Инструктаж, контроль работы тайного покупателя и сбор обратной связи выделенным куратором
+                    проекта позволяет минимизировать недопонимания между заказчиком исследования и конечным исполнителем</p>
+                <p class="mb-3 font-size-lg">
+                    Использование специализированной аппаратуры позволяет предоставлять
+                    качественные артефакты аудита (чек-лист, аудио, фото, документы)
+                </p>
+
+            </div>
+            <div class="col-lg-6 p-5">
+                <div class="header mt-5">
+                    <h3>Оперативность</h3>
+                </div>
+                    <p class="mb-3">Работа над ограниченным количеством проектов дает нам возможность
+                        быстро реагировать на любые потребности заказчика</p>
+                    <p class="mb-3 font-size-lg">
+                        оплата работы тайный покупателей в течение 48 часов после сдачи отчета позволяет повысить
+                        лояльность клиентов к проектам и компании-заказчику
+                    </p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- PARNERS -->
+<section class="content-section text-center bg-light" id="services">
+    <div class="container">
+        <div class="content-section-heading">
+            <h2 class="mb-5">Партнеры</h2>
+        </div>
+        <div class="row">
+            <div class="MultiCarousel" data-items="1,3,5,6" data-slide="1" id="MultiCarousel"  data-interval="1000">
+                <div class="MultiCarousel-inner">
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ГК КАН АВТО</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ТТС-Лада</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ТТС-Renault</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ТТС-Hyundai</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ТАТСОЦБАНК</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ТИКИ-ВИКИ</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">АВТОСОЮЗ</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">АВТО-1</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">ЕЛАБУГА-АВТО</span>
+
+                    </div>
+                    <div class="item p-2">
+                        <span class="text-uppercase font-size-lg font-weight-bold">Автоцентр ИНТЕР</span>
+
+                    </div>
+
+                </div>
+                <button class="btn btn-primary leftLst"><</button>
+                <button class="btn btn-primary rightLst">></button>
+            </div>
+        </div>
+    </div>
+</section><!-- FACTS -->
+
+<!-- Footer -->
+<footer class="footer text-center bg-primary">
+    <div class="container">
+        <ul class="list-inline mb-5">
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle bg-light mr-3" href="#">
+                    <i class="icon-social-facebook"></i>
+                </a>
+            </li>
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle bg-light mr-3" href="#">
+                    <i class="icon-social-vkontakte"></i>
+                </a>
+            </li>
+            <li class="list-inline-item">
+                <a class="social-link rounded-circle bg-light" href="#">
+                    <i class="icon-social-github"></i>
+                </a>
+            </li>
+        </ul>
+        <p class="text-muted small mb-0">Copyright &copy;</p>
+    </div>
+</footer>
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded js-scroll-trigger" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+
+<!-- Modal -->
+<div class="modal fade" id="callbackform" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Обратный звонок</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" id="callback-form">
+                    {% csrf_token %}
+                    {{ callback_form.as_ul }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-dismiss="modal">Закрыть</button>
+                <input type="submit" class="btn btn-primary" form="callback-form" value="Заказать">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript -->
+<script src="{% static 'index/vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'index/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- Plugin JavaScript -->
+<script src="{% static 'index/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<script src="{% static 'plugins/gsap/TweenMax.min.js' %}"></script>
+<script src="{% static 'plugins/gsap/plugins/ScrollToPlugin.min.js' %}"></script>
+
+<!-- Custom scripts for this template -->
+<script src="{% static 'index/js/stylish-portfolio.js' %}"></script>
+<script src="{% static 'index/js/index.js' %}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,208 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block css %}
+    <style>
+        .check:hover{
+            background-color: #eeeeee !important;
+        }
+        .select2-container{
+            width: 100%;
+            min-width: 100% !important;
+        }
+
+        .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
+            border-radius: 0!important;
+            display: flex;
+            align-items: center;
+
+            height: auto!important;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block meta %}
+    <title>Список проверок</title>
+{% endblock %}
+
+
+{% block page-header %}
+    Список проверок
+{% endblock %}
+
+{% block header-buttons %}
+    <a href="{% url 'check:create' %}" class="btn btn-primary m-1">Создать проверку</a>
+{% endblock %}
+
+
+{% block content %}
+
+
+    <!-- FILTER FORM -->
+    <form action="" method="get">
+        <div class="row">
+
+            <!-- STATUSES INPUT -->
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <span class="font-weight-bold text-black-50">Статус</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        {% for choice in filter.form.status %}
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="{{ choice.data.name }}"  value="{{ choice.data.value }}"
+                                       class="custom-control-input" id="{{ choice.id_for_label }}" {% if choice.data.selected %}checked{% endif %}>
+                                <label class="custom-control-label text-black-50" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div><!-- /STATUSES INPUT -->
+
+            <!-- DATE INPUT -->
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-2 mt-2">
+                            <label class="text-black-50 font-weight-bold" for="{{ filter.form.start_date.id_for_label }}">Дата начала</label>
+                            <div class="d-flex align-items-center">{{ filter.form.start_date }}</div>
+                        </div>
+                        <div class="mb-2 mt-2">
+                            <label class="text-black-50 font-weight-bold" for="{{ filter.form.end_date.id_for_label }}">Дата окончания</label>
+                            <div class="d-flex align-items-center">{{ filter.form.end_date }}</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div><!-- /DATE INPUT -->
+
+
+            <!-- TARGET AND CURATOR INPUT -->
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mt-2 mb-2">
+                            <label class="text-black-50 font-weight-bold" for="{{ filter.form.target.id_for_label }}">Цель</label>
+                            {{ filter.form.target }}
+                        </div>
+                        <div class="mt-2 mb-2">
+                            <label class="text-black-50 font-weight-bold" for="{{ filter.form.curator.id_for_label }}">Куратор</label>
+                            {{ filter.form.curator }}
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /TARGET AND CURATOR INPUT -->
+        </div>
+
+        <!-- FORM BUTTONS -->
+        <div class="row d-flex justify-content-center m-2">
+            <input type="submit" value="Показать" class="btn btn-dark m-1">
+            <a href="{% url 'check:list' %}" class="btn bg-grey-300 m-1">Очистить</a>
+        </div><!-- /FORM BUTTONS -->
+
+    </form><!-- /FILTER FORM -->
+
+
+    <div class="card">
+
+        <div class="card-body d-flex flex-column justify-content-between">
+
+            <!-- RESULTS -->
+            <div class="results">
+
+                <!-- RESULTS TABLE HEADER -->
+                <div class="results-header row bg-light m-1 p-2" style="border-radius: 3px">
+                    <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">ID</div>
+                    <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">Статус</div>
+                    <div class="col-3col-md-1 d-flex font-weight-bold text-black-50">Дата начала</div>
+                    <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">Дедлайн</div>
+                    <div class="col-12 col-md-3 d-flex font-weight-bold text-black-50">Цель</div>
+                    <div class="col-4 col-md-2 d-flex font-weight-bold text-black-50">Тайный покупатель</div>
+                    <div class="col-4 col-md-2 d-flex font-weight-bold text-black-50">Куратор</div>
+                    <div class="col-4 col-md-1 d-flex font-weight-bold text-black-50">Награда</div>
+                </div><!-- /RESULTS TABLE HEADER -->
+
+                {% for check in checks %}
+                    <a href="{{ check.get_absolute_url }}" class="d-flex row justify-content-between bg-light m-1 p-2 check" style="border-radius: 3px">
+                        <div class="col-3 col-md-1 text-black-50">{{ check.id }}</div>
+                        <div class="col-3 col-md-1"><span class="badge badge-info">{{ check.get_status_display }}</span></div>
+                        <div class="col-3 col-md-1 text-black-50">{{ check.start_date }}</div>
+                        <div class="col-3 col-md-1 text-black-50">{{ check.deadline }}</div>
+                        <div class="col-12 col-md-3 text-black-50">{{ check.target.title }}</div>
+                        <div class="col-4 col-md-2 text-black-50">{{ check.performer }}</div>
+                        <div class="col-4 col-md-2 text-black-50">{{ check.curator }}</div>
+                        <div class="col-4 col-md-1 text-black-50">{{ check.reward }}руб.</div>
+                    </a>
+
+                {% endfor %}
+            </div><!-- /RESULTS -->
+
+
+        </div>
+
+
+        {% if is_paginated %}
+            <!-- PAGINATION -->
+            <div class="d-flex justify-content-center mt-3 mb-3">
+
+                <ul class="pagination shadow-1">
+
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a href="?page=1" class="page-link page-link-white legitRipple"><<</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.previous_page_number }}" class="page-link page-link-white legitRipple"><</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <a href="#" class="page-link page-link-white legitRipple">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</a>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.next_page_number }}" class="page-link page-link-white legitRipple">></a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link page-link-white legitRipple">>></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div><!-- /PAGINATION -->
+
+        {% endif %}
+
+
+
+    </div>
+
+
+{% endblock %}
+
+
+{% block script %}
+    {{ filter.form.media }}
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+    <script>
+        let options = {
+            monthsFull: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            weekdaysFull: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            format: 'yyyy-mm-dd'
+        };
+        $('.pickadate').pickadate(options);
+    </script>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>Чек-лист</title>
+{% endblock %}
+
+{% block page-header %}
+    <a href="{{ checklist.check_obj.get_absolute_url }}">{{ checklist.check_obj.title }}</a> / Чек-лист
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="font-weight-bold text-black-50">Чек-лист</h1>
+        </div>
+    </div>
+
+    {% if checklist.audio %}
+        <div class="card">
+            <div class="card-body">
+                <audio controls class="w-100">
+                    <source src="{% url 'checklist:audio' checklist.id %}" type="audio/mp3" />
+                </audio>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if checklist.images.exists %}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    {% for image in checklist.images.all %}
+                        <div class="card col-4 col-sm-3 col-lg-2">
+                            <a class="card-body cursor-pointer" data-toggle="modal" data-target="#image-modal-{{ image.id }}">
+                                <img class="img-fluid" src="{{ image.file.url }}" alt="">
+                            </a>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+    
+
+    {% for section in sections %}
+        <div class="card">
+            <div class="card-header"><h3 class="font-weight-bold text-black-50">{{ section.name.value }}</h3></div>
+            <div class="card-body d-flex flex-column">
+                {% for question in section.questions.all %}
+                    <div class="d-flex w-100 bg-light p-2 m-1">
+                        <div class="col d-flex text-black-50">
+                            <div>{{ counter.increment }}<span> - </span></div> <div>{{ question.text|safe }}</div>
+                        </div>
+                        <div class="col text-black-50">
+                            {% if question.type == question_types.GENERAL %}
+                                {% if question.answer.answer == None %}
+                                    Нет ответа
+                                {% elif question.answer.answer == True %}
+                                    Да ({{ question.answer.positive_answer_value }})
+                                {% elif question.answer.answer == False %}
+                                    Нет (0)
+                                {% endif %}
+                            {% elif question.type == question_types.OPEN %}
+                                {% if question.answer.answer %}
+                                    {{ question.answer.answer }}
+                                {% else %}
+                                    Нет ответа
+                                {% endif %}
+
+                            {% elif question.type == question_types.INT_CHOICES %}
+                                {% if question.answer.answer %}
+                                    {{ question.answer.answer.value }} ({{ question.answer.answer.points }})
+                                {% else %}
+                                    Не выбрано:
+                                    {% for option in question.int_options.all %}
+                                        {{ option.value }}({{ option.points }}),
+                                    {% endfor %}
+
+                                {% endif %}
+
+                            {% elif question.type == question_types.TEXT_CHOICES %}
+                                {% if question.answer.answer %}
+                                    {{ question.answer.answer.value }}
+                                {% else %}
+                                    Не выбрано:
+                                    {% for option in question.text_options.all %}
+                                        {{ option.value }},
+                                    {% endfor %}
+                                {% endif %}
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                {% endfor %}
+
+                {% for section in section.subsections.all %}
+                    <div class="bg-light mt-2 p-2">
+                        <h5 class="font-weight-bold text-black-50">{{ section.name.value }} (подсекция)</h5></div>
+
+                        {% for question in section.questions.all %}
+                            <div class="d-flex w-100 bg-light p-2 m-1">
+                                <div class="col d-flex text-black-50">
+                                    <div>{{ counter.increment }}<span> - </span></div> <div>{{ question.text|safe }}</div>
+                                </div>
+                                <div class="col text-black-50">
+                                    {% if question.type == question_types.GENERAL %}
+                                        {% if question.answer.answer == None %}
+                                            Нет ответа
+                                        {% elif question.answer.answer == True %}
+                                            Да ({{ question.answer.positive_answer_value }})
+                                        {% elif question.answer.answer == False %}
+                                            Нет (0)
+                                        {% endif %}
+                                    {% elif question.type == question_types.OPEN %}
+                                        {% if question.answer.answer %}
+                                            {{ question.answer.answer }}
+                                        {% else %}
+                                            Нет ответа
+                                        {% endif %}
+
+                                    {% elif question.type == question_types.INT_CHOICES %}
+                                        {% if question.answer.answer %}
+                                            {{ question.answer.answer.value }} ({{ question.answer.answer.points }})
+                                        {% else %}
+                                            Не выбрано:
+                                            {% for option in question.int_options.all %}
+                                                {{ option.value }}({{ option.points }}),
+                                            {% endfor %}
+
+                                        {% endif %}
+                                    {% elif question.type == question_types.TEXT_CHOICES %}
+                                        {% if question.answer.answer %}
+                                            {{ question.answer.answer.value }}
+                                        {% else %}
+                                            Не выбрано:
+                                            {% for option in question.text_options.all %}
+                                                {{ option.value }},
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    {% endfor %}
+    
+    {% for image in checklist.images.all %}
+        <div id="image-modal-{{ image.id }}" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <img class="img-fluid" src="{{ image.file.url }}" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    {% endfor %}
+    
+{% endblock %}
+
+
+
+{% block script %}
+
+{% endblock %}

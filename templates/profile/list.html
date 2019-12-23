@@ -1,0 +1,122 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block css %}
+    <style>
+        .user:hover{
+            background-color: #eeeeee !important;
+        }
+
+        .status{
+            display: block;
+            font-size: 75%;
+            font-weight: 500;
+            -webkit-border-radius: 2px;
+            -moz-border-radius: 2px;
+            border-radius: 2px;
+        }
+        .select2-container{
+            width: 100%;
+            min-width: 100% !important;
+        }
+
+        .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
+            border-radius: 0!important;
+            display: flex;
+            align-items: center;
+
+            height: auto!important;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+    </style>
+
+{% endblock %}
+
+{% block page-header %}
+    Список пользователей
+{% endblock %}
+
+{% block header-buttons %}
+    <a href="{% url 'profile:create-staff' %}" class="btn btn-primary m-1">Добавить персонал</a>
+    <a href="{% url 'profile:create-performer' %}" class="btn btn-primary m-1">Добавить исполнителя</a>
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="" method="get" class="row">
+                <div class="overflow-hidden col-10">{{ filter.form.id }}</div>
+                <div class="overflow-hidden col-2 p-1 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-light font-weight-bold text-black-50 btn-icon">
+                        <i class="icon-search4"></i> Искать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+
+        <div class="card-body d-flex flex-column justify-content-between">
+            <div class="results-header row m-1 p-2" style="background-color: #eeeeee !important;">
+                <div class="col-6 col-sm-4 col-md-2 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Фамилия</div>
+                <div class="col-6 col-sm-4 col-md-2 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Имя</div>
+                <div class="col-6 col-sm-4 col-md-2 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Отчество</div>
+                <div class="col-6 col-sm-4 col-md-2 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Логин</div>
+                <div class="col-6 col-sm-4 col-md-2 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Email</div>
+                <div class="col-6 col-sm-4 col-md-1 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Номер телефона</div>
+                <div class="col-6 col-sm-4 col-md-1 font-weight-bold text-black-50 d-flex justify-content-center align-items-center">Тип</div>
+            </div>
+            <div class="results">
+                {% for user in users %}
+                    <a href="{% url 'profile:detail' user.id %}" class="d-flex col justify-content-between bg-light m-1 p-2 user">
+                        <div class="col-6 col-sm-4 col-md-2 text-black-50 d-flex justify-content-center">{{ user.last_name }}</div>
+                        <div class="col-6 col-sm-4 col-md-2 text-black-50 d-flex justify-content-center">{{ user.first_name }}</div>
+                        <div class="col-6 col-sm-4 col-md-2 text-black-50 d-flex justify-content-center">{{ user.patronymic }}</div>
+                        <div class="col-6 col-sm-4 col-md-2 text-black-50 d-flex justify-content-center">{{ user.username }}</div>
+                        <div class="col-6 col-sm-4 col-md-2 text-black-50 d-flex justify-content-center">{{ user.email }}</div>
+                        <div class="col-6 col-sm-4 col-md-1 text-black-50 d-flex justify-content-center">{{ user.phone_number }}</div>
+                        <div class="col-6 col-sm-4 col-md-1 text-black-50 d-flex justify-content-center align-items-center">
+                            <span class="status text-white p-1 bg-info text-center">{{ user.status }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if is_paginated %}
+            <div class="d-flex justify-content-center mt-3 mb-3">
+
+                <ul class="pagination shadow-1">
+
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a href="?page=1" class="page-link page-link-white legitRipple"><<</a></li>
+                        <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link page-link-white legitRipple"><</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a href="#" class="page-link page-link-white legitRipple">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</a></li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link page-link-white legitRipple">></a></li>
+                        <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}" class="page-link page-link-white legitRipple">>></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        {% endif %}
+
+
+
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ filter.form.media }}
+{% endblock %}

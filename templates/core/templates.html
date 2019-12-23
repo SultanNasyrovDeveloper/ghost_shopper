@@ -1,0 +1,73 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block header-buttons %}
+    <input type="submit" class="btn btn-primary" value="Сохранить" form="form">
+
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post" id="form">
+    {% csrf_token %}
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">Шаблоны писем исполнителям</h3>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">Приглашение на проверку</h3>
+        </div>
+
+        <div class="card-body">
+            <div>
+                <div>
+                    Для составления сообщения нужно использовать переменные:
+                        {performer} = ФИО исполнителя,
+                        {check} = название проверки.
+                        {link} = ссылка на проверку
+
+                    <p>Например,</p>
+                    <p>
+                        Уважаемый, {performer}!
+                        Предлагаем Вам провести {check}.
+                        {link}
+                    </p>
+
+                </div>
+            </div>
+            {{ form.invite_message }}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">Одобрение заявки</h3>
+        </div>
+
+        <div class="card-body">
+            <div>
+                <div>
+                    Для составления сообщения нужно использовать переменные:
+                        {performer} = ФИО исполнителя,
+                        {check} = название проверки.
+                        {link} = ссылка на проверку
+
+                    <p>Например,</p>
+                    <p>
+                        Уважаемый, {performer}!
+                        Ваша заявка на проведение {check} была одобрена.
+                        {link}
+                    </p>
+                </div>
+            </div>
+            {{ form.apply_message }}
+        </div>
+    </div>
+
+    </form>
+
+{% endblock %}

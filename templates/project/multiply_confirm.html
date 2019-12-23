@@ -1,0 +1,26 @@
+{% extends 'base/base_app.html' %}
+
+{% block page-header %}
+    <a href="{{ project.get_absolute_url }}">Проверка {{ project.name }}</a> / Размножить
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-body d-flex justify-content-center">
+            Вы уверены что хотите создать проверку для каждой цели:
+            {% for target in project.targets.all %}
+                <span class="badge badge-secondary m-1">{{ target.title }}</span>
+            {% endfor %}
+
+        </div>
+
+        <div class="card-footer d-flex justify-content-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="submit" value="Создать" class="btn btn-info">
+            </form>
+
+        </div>
+    </div>
+{% endblock %}

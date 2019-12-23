@@ -1,0 +1,644 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>Конструктор чек-листа</title>
+{% endblock %}
+
+
+{% block css %}
+    <style>
+        .loader-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background-color: white;
+
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+            z-index: 2000;
+        }
+
+        .loader{
+            width: 100px;
+            height: 100px;
+            border-radius: 100%;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        #loader-4 span{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 100%;
+            background-color: #3498db;
+            margin: 35px 5px;
+            opacity: 0;
+        }
+
+        #loader-4 span:nth-child(1){
+            animation: opacitychange 1s ease-in-out infinite;
+        }
+
+        #loader-4 span:nth-child(2){
+            animation: opacitychange 1s ease-in-out 0.33s infinite;
+        }
+
+        #loader-4 span:nth-child(3){
+            animation: opacitychange 1s ease-in-out 0.66s infinite;
+        }
+
+        @keyframes opacitychange{
+            0%, 100%{
+                opacity: 0;
+            }
+
+            60%{
+                opacity: 1;
+            }
+        }
+
+        .question-wrapper:hover{
+            background-color: #eeeeee !important;
+        }
+    </style>
+    <link href="{% static 'plugins/summernote/summernote-lite.css' %}" rel="stylesheet">
+    <script src="{% static 'plugins/summernote/summernote-lite.min.js' %}"></script>
+
+    <script>
+        let questionTypesJson = "{{ question_types_json|escapejs }}";
+        let checklist = "{{ checklist_json|escapejs }}";
+    </script>
+
+
+{% endblock %}
+
+
+{% block page-header %}
+    {% if checklist.check_obj.project %}
+        <a href="{{ checklist.check_obj.project.get_absolute_url }}">Проект {{ checklist.check_obj.project.name }}</a> / Чеклист
+    {% else %}
+        <a href="{{ checklist.check_obj.get_absolute_url }}">{{ checklist.check_obj.title }}</a> / Конструктор чек-листа
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="card bg-transparent border-0 shadow-0 p-0">
+        <div class="card-body p-0">
+            <!-- VUE APP -->
+            <div id="app">
+
+                <!-- CHECKLIST -->
+                <div id="checklist">
+
+                    <!-- CHECKLIST NAME -->
+                    <div class="card mb-2 bg-white" :data-checklist-id="checklist.id">
+                        <div class="card-header"><h3 class="font-weight-bold text-black-50">[[ checklist.name ]]</h3></div>
+
+                    </div><!-- /CHECKLIST NAME -->
+
+                    <!-- SECTION CONTAINER -->
+                    <div class="section-container mb-3" v-for="section in checklist.sections">
+
+                        <!-- SECTION -->
+                        <div class="card mb-1">
+
+                            <!-- SECTION NAME -->
+                            <div class="card-header bg-grey-300 header-elements-inline">
+                                <h3 class="card-title font-weight-bold text-white">[[ section.name ]]</h3>
+                                <div class="header-elements">
+                                    <div class="list-icons">
+                                        <a data-href="{% url 'checklist:constructor:delete_section' %}"
+                                           class="btn bg-transparent text-danger delete-section cursor-pointer"
+                                           @click.prevent="deleteSection" :data-section-id="section.id">
+                                                <i class="icon-close2" :data-section-id="section.id"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div><!-- /SECTION NAME -->
+
+                            <!-- SECTION BODY-->
+                            <div class="card-body">
+
+                                <!-- QUESTIONS CONTAINER -->
+                                <div class="questions-container">
+
+                                    <!-- QUESTIONS HEADER -->
+                                    <div class="card-header" style="background-color: #eeeeee !important;">
+                                        <div class="row">
+                                            <div class="col-4 d-flex justify-content-center font-weight-bold text-black-50">Вопрос</div>
+                                            <div class="col-2 d-flex justify-content-center font-weight-bold text-black-50">Тип</div>
+                                            <div class="col-4 d-flex justify-content-center font-weight-bold text-black-50">Ответ(Баллы)</div>
+                                            <div class="col-2 d-flex justify-content-center font-weight-bold text-black-50">*</div>
+                                        </div>
+
+                                    </div><!-- /QUESTIONS HEADER -->
+
+
+                                    <div>
+                                        <div class="question-wrapper bg-light p-1 mt-1 mb-1" v-for="question in section.questions">
+                                            <!-- QUESTIONS -->
+                                            <div class="question row" >
+                                                <div class="col-4 d-flex align-items-center text-black-50" v-html="question.text"></div>
+                                                <div class="col-2 d-flex justify-content-center align-items-center text-black-50">[[ question.type ]]</div>
+
+                                                <div class="col-4 d-flex justify-content-center align-items-center text-black-50" v-if="question.type === questionTypes.GENERAL">
+                                                    Да([[ question.answer.positive_answer_value ]])/ Нет(0)
+                                                </div>
+                                                <div class="col-4 d-flex justify-content-center align-items-center text-black-50" v-else-if="question.type === questionTypes.OPEN">
+                                                    Открытый(0)
+                                                </div>
+                                                <div class="col-4 d-flex flex-column" v-else>
+                                                    <div class="row" v-for="option in question.options" >
+                                                        <div class="col-8 d-flex flex-column justify-content-center">
+                                                            <div class="option text-black-50" v-if="question.type === questionTypes.INT_CHOICES">
+                                                                [[ option.value ]]([[option.points]])
+                                                            </div>
+                                                            <div class="option align-items-center text-black-50" v-if="question.type === questionTypes.TEXT_CHOICES">
+                                                                [[option.value]](0)
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4 d-flex">
+                                                            <button type="button" class="btn btn-outline bg-teal-400 text-teal-400 btn-icon m-1" @click="prepareOptionCreation"
+                                                                    data-toggle="modal" data-target="#create-int-option-modal" v-if="question.type === questionTypes.INT_CHOICES"
+                                                                    :data-question-id="[[ question.id ]]" :data-option-id="[[ option.id ]]">
+                                                                <i class="icon-plus2" :data-question-id="[[ question.id ]]" :data-option-id="[[ option.id ]]"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline bg-teal-400 text-teal-400 btn-icon m-1" @click="prepareOptionCreation"
+                                                                    data-toggle="modal" data-target="#create-text-option-modal" v-if="question.type === questionTypes.TEXT_CHOICES"
+                                                                    :data-question-id="[[ question.id ]]" :data-option-id="[[ option.id ]]">
+                                                                <i class="icon-plus2" :data-question-id="[[ question.id ]]" :data-option-id="[[ option.id ]]"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline bg-danger-400 text-danger-400 btn-icon m-1 delete-option"
+                                                                    :data-option-id="[[ option.id ]]" data-url="{% url 'checklist:constructor:delete_option' %}" @click="deleteOption" :data-question-type="[[ question.type ]]">
+                                                                <i class="icon-minus2" :data-option-id="[[ option.id ]]" :data-question-type="[[ question.type ]]"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <button type="button" class="btn bg-transparent btn-icon text-teal-400 m-1" @click="prepareOptionCreation"
+                                                            data-toggle="modal" data-target="#create-int-option-modal" v-if="question.type === questionTypes.INT_CHOICES && question.options.length === 0"
+                                                            :data-question-id="[[ question.id ]]" >
+                                                        <i class="icon-plus2" :data-question-id="[[ question.id ]]"></i>
+                                                    </button>
+                                                    <button type="button" class="btn bg-transparent text-teal-400 btn-icon m-1" @click="prepareOptionCreation"
+                                                            data-toggle="modal" data-target="#create-text-option-modal" v-if="question.type === questionTypes.TEXT_CHOICES && question.options.length === 0"
+                                                            :data-question-id="[[ question.id ]]">
+                                                        <i class="icon-plus2" :data-question-id="[[ question.id ]]"></i>
+                                                    </button>
+                                                </div>
+
+                                                <div class="col-2 d-flex justify-content-center align-items-center">
+                                                    <button type="button" class="btn text-teal-400 dropdown-toggle btn-icon m-1" data-toggle="dropdown" aria-expanded="false">
+                                                        <i class="icon-plus2"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(113px, 36px, 0px);">
+                                                        <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                           :data-section-id="section.id" :data-question-type="questionTypes.GENERAL"
+                                                           data-toggle="modal" data-target="#create-general-question-modal">Общий</a>
+                                                        <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                           :data-section-id="section.id" :data-question-type="questionTypes.OPEN"
+                                                           data-toggle="modal" data-target="#create-open-question-modal">Открытый</a>
+                                                        <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                           :data-section-id="section.id" :data-question-type="questionTypes.INT_CHOICES"
+                                                           data-toggle="modal" data-target="#create-int-choices-question-modal">С числовыми вариантами</a>
+                                                        <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                           :data-section-id="section.id" :data-question-type="questionTypes.TEXT_CHOICES"
+                                                           data-toggle="modal" data-target="#create-text-choices-question-modal">С текстовыми вариантами</a>
+                                                    </div>
+                                                    <button data-url="{% url 'checklist:constructor:delete-question' %}" type="button" class="btn text-danger btn-icon m-1 delete-question-button"
+                                                            @click="deleteQuestion" :data-question-id="question.id">
+                                                        <i class="icon-trash" :data-question-id="question.id"></i>
+                                                    </button>
+                                                </div>
+
+                                            </div><!-- /QUESTIONS -->
+                                        </div>
+                                    </div>
+
+
+                                </div><!-- /QUESTIONS CONTAINER -->
+
+                                <!-- SUBSECTIONS CONTAINER -->
+                                <div class="subsections mt-3">
+
+                                    <!-- SUBSECTION -->
+                                    <div class="subsection mt-2 mb-2" v-for="subsection in section.subsections">
+
+                                        <!-- SUBSECTION HEADER -->
+                                        <div class="card-header header-elements-inline" style="background-color: #eeeeee !important;">
+                                            <h6 class="card-title font-weight-bold text-black-50">[[ subsection.name ]] (подсекция)</h6>
+                                            <div class="header-elements">
+                                                <div class="list-icons">
+                                                    <a data-href="{% url 'checklist:constructor:delete_section' %}"
+                                                       class="btn bg-transparent text-danger btn-icon delete-section cursor-pointer"
+                                                       @click.prevent="deleteSection" :data-section-id="subsection.id">
+                                                            <i class="icon-close2" :data-section-id="subsection.id"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div><!-- /SUBSECTION HEADER -->
+
+                                        <!-- SUBSECTION QUESTIONS CONTAINER -->
+                                        <div>
+
+                                            <div class="question-wrapper bg-light p-1 mt-1 mb-1" v-for="question in subsection.questions">
+
+                                                <!-- QUESTION -->
+                                                <div class="question row" >
+                                                    <div class="col-4 d-flex align-items-center text-black-50" v-html="question.text"></div>
+                                                    <div class="col-2 d-flex justify-content-center align-items-center text-black-50">[[ question.type ]]</div>
+                                                    <div class="col-4 d-flex justify-content-center align-items-center text-black-50" v-if="question.type === questionTypes.GENERAL">
+                                                        Да([[ question.answer.positive_answer_value ]])/ Нет(0)
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-center align-items-center text-black-50" v-else-if="question.type === questionTypes.OPEN">
+                                                        Открытый(0)
+                                                    </div>
+                                                    <div class="col-4 d-flex flex-column" v-else>
+                                                        <div class="row" v-for="option in question.options" >
+                                                            <div class="col-8 d-flex flex-column justify-content-center">
+                                                                <div class="option text-black-50" v-if="question.type === questionTypes.INT_CHOICES">
+                                                                    [[ option.value ]]([[option.points]])
+                                                                </div>
+                                                                <div class="option align-items-center text-black-50" v-if="question.type === questionTypes.TEXT_CHOICES">
+                                                                    [[option.value]](0)
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-4 d-flex">
+                                                                <button type="button" class="btn btn-outline bg-teal-400 text-teal-400 btn-icon m-1" @click="prepareOptionCreation"
+                                                                        data-toggle="modal" data-target="#create-int-option-modal" v-if="question.type === questionTypes.INT_CHOICES"
+                                                                        :data-question-id="[[ question.id ]]" :data-option-id="[[ option.id ]]">
+                                                                    <i class="icon-plus2" :data-question-id="[[ question.id ]]"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-outline bg-teal-400 text-teal-400 btn-icon m-1" @click="prepareOptionCreation"
+                                                                        data-toggle="modal" data-target="#create-text-option-modal" v-if="question.type === questionTypes.TEXT_CHOICES"
+                                                                        :data-question-id="[[ question.id ]]" :data-option-id="[[ option.id ]]">
+                                                                    <i class="icon-plus2" :data-question-id="[[ question.id ]]"></i>
+                                                                </button>
+                                                                <button type="button" class="btn btn-outline bg-danger-400 text-danger-400 btn-icon m-1">
+                                                                    <i class="icon-minus2"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="btn bg-transparent btn-icon text-teal-400 m-1" @click="prepareOptionCreation"
+                                                                data-toggle="modal" data-target="#create-int-option-modal" v-if="question.type === questionTypes.INT_CHOICES && question.options.length === 0"
+                                                                :data-question-id="[[ question.id ]]" >
+                                                            <i class="icon-plus2" :data-question-id="[[ question.id ]]"></i>
+                                                        </button>
+                                                        <button type="button" class="btn bg-transparent text-teal-400 btn-icon m-1" @click="prepareOptionCreation"
+                                                                data-toggle="modal" data-target="#create-text-option-modal" v-if="question.type === questionTypes.TEXT_CHOICES && question.options.length === 0"
+                                                                :data-question-id="[[ question.id ]]">
+                                                            <i class="icon-plus2" :data-question-id="[[ question.id ]]"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="col-2 d-flex justify-content-center align-items-center">
+                                                        <button type="button" class="btn text-teal-400 dropdown-toggle btn-icon m-1" data-toggle="dropdown" aria-expanded="false">
+                                                            <i class="icon-plus2"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(113px, 36px, 0px);">
+                                                            <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                               :data-section-id="subsection.id" :data-question-type="questionTypes.GENERAL"
+                                                               data-toggle="modal" data-target="#create-general-question-modal">Общий</a>
+                                                            <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                               :data-section-id="subsection.id" :data-question-type="questionTypes.OPEN"
+                                                               data-toggle="modal" data-target="#create-open-question-modal">Открытый</a>
+                                                            <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                               :data-section-id="subsection.id" :data-question-type="questionTypes.INT_CHOICES"
+                                                               data-toggle="modal" data-target="#create-int-choices-question-modal">С числовыми вариантами</a>
+                                                            <a href="#" class="dropdown-item" @click.prevent="prepareBelowQuestionCreation" :data-question-id="question.id"
+                                                               :data-section-id="subsection.id" :data-question-type="questionTypes.TEXT_CHOICES"
+                                                               data-toggle="modal" data-target="#create-text-choices-question-modal">С текстовыми вариантами</a>
+                                                        </div>
+                                                        <button data-url="{% url 'checklist:constructor:delete-question' %}" type="button" class="btn text-danger btn-icon m-1 delete-question-button"
+                                                                @click="deleteQuestion" :data-question-id="question.id">
+                                                            <i class="icon-trash" :data-question-id="question.id"></i>
+                                                        </button>
+                                                    </div>
+                                                </div><!-- /QUESTION -->
+
+                                            </div>
+
+                                        </div><!-- /SUBSECTION QUESTIONS CONTAINER -->
+
+                                        <div class="d-flex justify-content-center mt-1">
+                                            <!-- ADD NEW QUESTION-->
+                                            <button type="button" class="btn btn-light dropdown-toggle m-1" data-toggle="dropdown" aria-expanded="false" v-if="subsection.questions.length === 0">
+                                                Добавить вопрос
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(113px, 36px, 0px);">
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ subsection.id ]]" :data-question-type="[[ questionTypes.GENERAL ]]"
+                                                   data-toggle="modal" data-target="#create-general-question-modal">Общий</a>
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ subsection.id ]]" :data-question-type="[[ questionTypes.OPEN ]]"
+                                                   data-toggle="modal" data-target="#create-open-question-modal">Открытый</a>
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ subsection.id ]]" :data-question-type="[[ questionTypes.INT_CHOICES ]]"
+                                                   data-toggle="modal" data-target="#create-int-choices-question-modal">С числовыми вариантами</a>
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ subsection.id ]]" :data-question-type="[[ questionTypes.TEXT_CHOICES ]]"
+                                                   data-toggle="modal" data-target="#create-text-choices-question-modal">С текстовыми вариантами</a>
+                                            </div><!-- /ADD NEW QUESTION -->
+                                            <button type="button" class="btn btn-light m-1" data-toggle="modal" data-target="#create-section-modal"
+                                                    :data-section-id="[[ section.id ]]" :data-upper-section="[[ subsection.id ]]" @click="prepareSubsectionCreation">
+                                                Создать подсекцию под
+                                            </button>
+                                        </div>
+
+                                    </div><!-- /SUBSECTION -->
+
+                                </div><!-- /SUBSECTIONS CONTAINER -->
+
+                                <div class="section-buttons d-flex justify-content-center">
+                                    <!-- ADD NEW QUESTION-->
+                                    <button type="button" class="btn btn-light dropdown-toggle m-1" data-toggle="dropdown" aria-expanded="false" v-if="section.questions.length === 0">
+                                                Добавить вопрос
+                                            </button>
+                                    <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(113px, 36px, 0px);">
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ section.id ]]" :data-question-type="[[ questionTypes.GENERAL ]]"
+                                                   data-toggle="modal" data-target="#create-general-question-modal">Общий</a>
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ section.id ]]" :data-question-type="[[ questionTypes.OPEN ]]"
+                                                   data-toggle="modal" data-target="#create-open-question-modal">Открытый</a>
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ section.id ]]" :data-question-type="[[ questionTypes.INT_CHOICES ]]"
+                                                   data-toggle="modal" data-target="#create-int-choices-question-modal">С числовыми вариантами</a>
+                                                <a href="#" class="dropdown-item" @click.prevent="prepareQuestionCreation"
+                                                   :data-section-id="[[ section.id ]]" :data-question-type="[[ questionTypes.TEXT_CHOICES ]]"
+                                                   data-toggle="modal" data-target="#create-text-choices-question-modal">С текстовыми вариантами</a>
+                                            </div><!-- /ADD NEW QUESTION -->
+                                    <button type="button" class="btn btn-light m-1" data-toggle="modal" data-target="#create-section-modal"
+                                            :data-section-id="[[ section.id ]]" @click="prepareSubsectionCreation" v-if="section.subsections.length === 0">
+                                        Создать подсекцию
+                                    </button>
+                                </div>
+
+                            </div><!-- /SECTION BODY-->
+
+                        </div><!-- /SECTION -->
+
+                        <!-- SECTION BUTTON-->
+                        <div class="d-flex justify-content-center m-1">
+                            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#create-section-modal"
+                                    :data-section-id="[[ section.id ]]" @click="prepareSectionCreation">
+                                Создать секцию
+                            </button>
+                        </div><!-- /SECTION BUTTON -->
+
+                    </div><!-- /SECTION CONTAINER -->
+
+                    <div class="d-flex justify-content-center m-1">
+                        <button v-if="checklist.sections.length === 0" type="button" class="btn btn-dark" data-toggle="modal"
+                                    data-target="#create-section-modal">
+                            Создать секцию
+                        </button>
+                    </div>
+
+
+                </div><!-- /CHECKLIST -->
+
+
+                <!-- CREATE SECTION MODAL -->
+                <div id="create-section-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить новую секцию</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupSectionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+                                <form action="{% url 'checklist:constructor:create-section' %}" id="create-section-form">
+                                    {{ section_form }}
+                                </form>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal" @click="cleanupSectionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createSection">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /CREATE SECTION MODAL -->
+
+                <!-- CREATE GENERAL QUESTION MODAL -->
+                <div id="create-general-question-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true" data-create-url="{% url 'checklist:constructor:create_general_question' %}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить общий вопрос</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupQuestionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+
+                                <form class="question-creation-form">
+                                    {{ question_form }}
+                                </form>
+
+                                <form class="answer-creation-form">
+                                    {{ general_answer_form }}
+                                </form>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal" @click="cleanupQuestionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createQuestion">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE OPEN QUESTION MODAL -->
+                <div id="create-open-question-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true" data-create-url="{% url 'checklist:constructor:create_open_question' %}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить открытый вопрос</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupQuestionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+
+                                <form class="question-creation-form">
+                                    {{ question_form }}
+                                </form>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal" @click="cleanupQuestionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createQuestion">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE INT CHOICES QUESTION MODAL -->
+                <div id="create-int-choices-question-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true" data-create-url="{% url 'checklist:constructor:create_int_choices_question' %}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить вопрос с текстовыми вариантами</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupQuestionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+                                <form class="question-creation-form">
+                                    {{ question_form }}
+                                </form>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal" @click="cleanupQuestionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createQuestion">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE TEXT CHOICES QUESTION MODAL -->
+                <div id="create-text-choices-question-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true" data-create-url="{% url 'checklist:constructor:create_text_choices_question' %}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить вопрос с текстовыми вариантами</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupQuestionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+
+                                <form class="question-creation-form">
+                                    {{ question_form }}
+                                </form>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal" @click="cleanupQuestionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createQuestion">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE INT OPTION MODAL -->
+                <div id="create-int-option-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true" data-create-url="{% url 'checklist:constructor:create_int_option' %}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить числовой вариант</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupOptionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+
+                                <form class="option-form">
+                                    {{ int_option_form }}
+                                </form>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal"  @click="cleanupOptionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createOption">Создать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE TEXT OPTION MODAL -->
+                <div id="create-text-option-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true" data-create-url="{% url 'checklist:constructor:create_text_option' %}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Добавить текстовый вариант</h5>
+                                <button type="button" class="close" data-dismiss="modal" @click="cleanupOptionCreationForm">×</button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div v-if="formErrors !== ''" class="form-text text-danger">
+                                    <ul v-for="error_list in formErrors" style="list-style: none">
+                                        <li v-for="error in error_list">[[error]]</li>
+                                    </ul>
+                                </div>
+
+                                <form class="option-form">
+                                    {{ text_option_form }}
+                                </form>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal" @click="cleanupOptionCreationForm">Закрыть</button>
+                                <button type="button" class="btn bg-primary" @click="createOption">Создать</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /VUE APP -->
+
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block loader %}
+    <div class="loader-container">
+        <div class="loader" id="loader-4">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+    <script src="{% static 'plugins/vue/vue.js' %}"></script>
+    <script src="{% static 'plugins/axios/axios.js' %}"></script>
+    <script src="{% static 'js/checklist/constructor.js' %}"></script>
+{% endblock %}

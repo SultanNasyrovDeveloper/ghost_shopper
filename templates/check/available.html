@@ -1,0 +1,83 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block meta %}
+    <title>{{ page_title }}</title>
+{% endblock %}
+
+
+{% block css %}
+    <style>
+        .check:hover{
+            background-color: #eeeeee !important;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block page-header %}
+    {{ page_title }}
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="card">
+
+        <div class="card-body d-flex flex-column justify-content-between p-1">
+            <div class="results container-fluid">
+                <div class="results-header row bg-grey-300 text-white font-weight-bold m-1 p-2" style="border-radius: 3px">
+                    <div class="col-6 col-sm-3 col-lg-1 d-flex">ID</div>
+                    <div class="col-6 col-sm-3 col-lg-1 d-flex">Статус</div>
+                    <div class="col-6 col-sm-3 col-lg-2 d-flex">Дата начала</div>
+                    <div class="col-6 col-sm-3 col-lg-2 d-flex">Дедлайн</div>
+                    <div class="col-12 col-sm-9 col-lg-5 d-flex">Цель</div>
+                    <div class="col-12 col-sm-3 col-lg-1 d-flex">Награда</div>
+                </div>
+                {% for check in checks %}
+                    <a href="{{ check.get_absolute_url }}" class="d-flex row justify-content-between bg-light m-1 p-2 check" style="border-radius: 3px">
+                        <div class="col-6 col-sm-3 col-lg-1 text-black-50">{{ check.id }}</div>
+                        <div class="col-6 col-sm-3 col-lg-1"><span class="badge badge-info">{{ check.get_status_display }}</span></div>
+                        <div class="col-6 col-sm-3 col-lg-2 text-black-50">{{ check.start_date }}</div>
+                        <div class="col-6 col-sm-3 col-lg-2 text-black-50">{{ check.deadline }}</div>
+                        <div class="col-12 col-sm-9 col-lg-5 text-black-50">{{ check.target.title }}</div>
+                        <div class="col-12 col-sm-3 col-lg-1 text-black-50">{{ check.reward }}руб.</div>
+                    </a>
+                {% empty %}
+                    <div class="m-3">
+                        <span class="font-size-lg text-black-50">На данный момент нет доступных проверок</span>
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        {% if is_paginated %}
+            <div class="d-flex justify-content-center mt-3 mb-3">
+
+                <ul class="pagination shadow-1">
+
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a href="?page=1" class="page-link page-link-white legitRipple"><<</a></li>
+                        <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link page-link-white legitRipple"><</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a href="#" class="page-link page-link-white legitRipple">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</a></li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link page-link-white legitRipple">></a></li>
+                        <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}" class="page-link page-link-white legitRipple">>></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        {% endif %}
+
+
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ filter.form.media }}
+{% endblock %}

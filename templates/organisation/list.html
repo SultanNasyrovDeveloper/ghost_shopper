@@ -1,0 +1,135 @@
+{% extends 'base/base_app.html' %}>
+{% load staticfiles %}
+
+{% block meta %}
+    <title>Список организаций</title>
+{% endblock %}
+
+{% block css %}
+    <style>
+        .organisation:hover{
+            background-color: #eeeeee !important;
+        }
+        .select2-container{
+            width: 100%;
+            min-width: 100% !important;
+        }
+
+        .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
+            border-radius: 0!important;
+            display: flex;
+            align-items: center;
+
+            height: auto!important;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block page-header %}
+    Список организаций
+{% endblock %}
+
+{% block header-buttons %}
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#organisation-create-form-modal">Создать организацию</button>
+{% endblock %}
+
+
+
+{% block content %}
+    <a href=""></a>
+    <div class="card">
+        <div class="card-body">
+            <form class="d-flex justify-content-between " method="get">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-10">
+                            {{ filter.form.name }}
+                        </div>
+                        <div class="col-2 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-light font-weight-bold text-black-50 btn-icon"><i class="icon-search4"></i> Искать</button>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <div class="card">
+        <div class="card-body d-flex flex-column justify-content-between">
+            <div class="row">
+                {% for organisation in organisations %}
+                    <a class="organisation col-12 bg-light m-1 p-2 font-weight-bold text-black-50" href="{{ organisation.get_absolute_url }}">{{ organisation.name }}</a>
+                {% endfor %}
+            </div>
+
+            {% if is_paginated %}
+                <div class="d-flex justify-content-center mt-3 mb-3">
+                    <ul class="pagination shadow-1">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a href="?page=1" class="page-link page-link-white legitRipple"><<</a></li>
+                            <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link page-link-white legitRipple"><</a></li>
+                        {% endif %}
+
+                        <li class="page-item active"><a href="#" class="page-link page-link-white legitRipple">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</a></li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link page-link-white legitRipple">></a></li>
+                            <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}" class="page-link page-link-white legitRipple">>></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+            {% endif %}
+
+
+
+            
+        </div>
+    </div>
+
+
+    <div id="organisation-create-form-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-black-50 font-weight-bold">Создать организацию</h5>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'organisation:create' %}" method="post" id="organisation-create-form">
+                        {% csrf_token %}
+                        {% for field in organisation_form %}
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    {{ field }}
+                                </div>
+                                {% if field.errors %}
+                                    <div class="col-12">
+                                        <span class="text-danger">{{ field.errors.as_text }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link text-primary legitRipple" data-dismiss="modal">Закрыть<div class="legitRipple-ripple" style="left: 41.036%; top: 63.1579%; transform: translate3d(-50%, -50%, 0px); width: 225.28%; opacity: 0;"></div></button>
+                    <input form="organisation-create-form" type="submit" class="btn btn-primary legitRipple" value="Создать">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    {{ filter.form.media }}
+{% endblock %}

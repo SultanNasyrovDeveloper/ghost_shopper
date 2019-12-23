@@ -1,0 +1,234 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>{{ check.title }}</title>
+{% endblock %}
+
+{% block page-header %}
+    <a href="{% url 'check:list' %}">Список проверок</a> / {{ check.title }}
+{% endblock %}
+
+{% block header-buttons %}
+
+
+    {% if user.is_performer %}{# USER IS PERFORMER #}
+
+        {% if check.get_status_display == statuses.AVAILABLE %} {# status avilable #}
+            {% if perform_request_exists %} {# check if perform request exist #}
+                <button class="btn btn-primary disabled">Заявка создана</button>
+
+            {% else %} {# else show button to create perform request #}
+                <form action="{% url 'check:create-perform-request' check.id %}" method="post">
+                    {% csrf_token %}
+                    {{ perform_request_form }}
+                    <input type="submit" value="Заявка на исполнение" class="btn btn-primary">
+                </form>
+            {% endif %}
+
+        {% elif check.get_status_display == statuses.PROCESSING %}  {# status processing #}
+            <form action="{% url 'check:make-filled' check.id %}" method="post">  {# send check to curator form #}
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="На проверку">
+            </form>
+        {% endif %}
+
+
+    {% elif user.is_customer %} {# USER CUSTOMER #}
+        {% if check.get_status_display == statuses.CONFORMATION %}  {# if status is sent for conformation #}
+
+            {# show appeal button #}
+            <a href="{% url 'checklist:appeal' check.checklist.id %}" class="btn btn-primary m-1">Аппелировать</a>
+
+            {# show close form #}
+            <form action="{% url 'check:make-close' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="Закрыть">
+            </form>
+        {% endif %}
+
+    {% elif user.is_staff %}  {# USER STAFF #}
+        <a href="{% url 'check:excel' check.id %}" class="btn btn-primary m-1">Отчет</a>
+
+
+        {% if check.get_status_display == statuses.CREATED %} {# current status is created #}
+            <form action="{% url 'check:make-available' check.id %}" method="post">  {# show make available form #}
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="Сделать доступной">
+            </form>
+
+        {% elif check.get_status_display == statuses.AVAILABLE %}  {# current status is available #}
+            <a href="{% url 'check:appoint-performer' check.id %}" class="btn btn-primary m-1">Назначить исполнителя</a>
+
+        {% elif check.get_status_display == statuses.PROCESSING %} {# current status is processing #}
+            <form action="{% url 'check:make-filled' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="На проверку">
+            </form>
+
+        {% elif check.get_status_display == statuses.FILLED %}  {# current status is filled #}
+            <form action="{% url 'check:make-conformation' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="На одобрение">
+            </form>
+            <form action="{% url 'check:make-rework' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="На доработку">
+            </form>
+
+        {% elif check.get_status_display == statuses.CONFORMATION %}  {# current status is conformation #}
+            <form action="{% url 'check:make-close' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="Закрыть">
+            </form>
+
+        {% elif check.get_status_display == statuses.APPEAL %}  {# current status is appeal #}
+            <form action="{% url 'check:make-conformation' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="На одобрение">
+            </form>
+            <form action="{% url 'check:make-close' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="Закрыть">
+            </form>
+
+        {% elif check.get_status_display == statuses.CLOSED %}  {# current status is closed #}
+            <form action="{% url 'check:make-processing' check.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary m-1" value="В работу">
+            </form>
+        {% endif %}
+
+
+        <a href="{% url 'check:update' check.id %}" class="btn btn-primary m-1">Редактировать</a>
+        <a href="{% url 'check:delete' check.id %}" class="btn btn-danger m-1">Удалить</a>
+    {% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+
+        <!-- CHECK NAME -->
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">{{ check.title }}</h3>
+        </div><!-- /CHECK NAME -->
+
+
+        <!-- CHECK DESCRIPTION -->
+        <div class="card-body">
+
+            <div class="row mt-2"> <!-- check id -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Идентификатор: </div>
+                <div class="text-black-50 col-6 col-sm-9">{{ check.id }}</div>
+            </div>
+
+            <div class="row mt-2">  <!-- check status -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Статус:</div>
+                <div class="text-black-50 col-6 col-sm-9"> <span class="badge badge-info">{{ check.get_status_display }}</span></div>
+            </div>
+
+            <div class="row mt-2">  <!-- check start date -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Дата начала:</div>
+                <div class="text-black-50 col-6 col-sm-9">{{ check.start_date }}</div>
+            </div>
+
+            <div class="row mt-2">  <!-- check deadline -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Дата окончания:</div>
+                <div class="text-black-50 col-6 col-sm-9">{{ check.deadline }}</div>
+            </div>
+
+            <div class="row mt-2">  <!-- check target -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Цель:</div>
+                <div class="text-black-50 col-6 col-sm-9">
+                    {% if user.is_performer %}
+                        {{ check.target.title }}
+                    {% else %}
+                        <a href="{{ check.target.get_absolute_url }}">{{ check.target.title }}</a>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="row mt-2">  <!-- check performer -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Тайный покупатель:</div>
+
+                <div class="text-black-50 col-6 col-sm-9">
+                    {% if user.is_customer %}
+                        {% if check.performer %}
+                            {{ check.performer.get_full_name }}
+                        {% elif check.performer_types %}
+                            {{ check.performer_typed }}
+                        {% else %}
+                            Не указан
+                        {% endif %}
+
+                    {% else %}
+                        {% if check.performer %}
+                            <a href="{{ check.performer.get_absolute_url }}">{{ check.performer.get_full_name }}</a>
+                        {% elif check.performer_types %}
+                            {{ check.performer_typed }}
+                        {% else %}
+                            Не указан
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row mt-2">  <!-- check checklist -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Чек-лист:</div>
+                <div class="text-black-50 col-6 col-sm-9">
+                    {% if user.is_staff %}
+                        <a href="{% url 'checklist:constructor:constructor' check.checklist.id %}">Конструктор</a> |
+                        <a href="{% url 'checklist:detail' check.checklist.id %}">Просмотр</a> |
+                        <a href="{% url 'checklist:update' check.checklist.id %}">Редактировать</a> |
+
+                    {% elif user.is_customer %}
+                        <a href="{% url 'checklist:detail' check.checklist.id %}">Просмотр</a>
+                        {% if user.customer_profile.is_boss %}
+                           | <a href="{% url 'checklist:update' check.checklist.id %}">Редактировать</a>
+                        {% endif %}
+
+                    {% elif user.is_performer %}
+                        {% if user == check.performer %}
+                            {% if check.status == statuses.PROCESSING %}
+                                <a href="{% url 'checklist:update' check.checklist.id %}">Редактировать</a>
+                            {% else %}
+                                <a href="{% url 'checklist:detail' check.checklist.id %}">Просмотр</a>
+                            {% endif %}
+                        {% else %}
+                            Чек-лист будет доступен после одобрения
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <div class="row mt-2">  <!-- check instruction -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Инструкция:</div>
+                <div class="text-black-50 col-6 col-sm-9"><a href="{{ check.instruction.get_absolute_url }}">Просмотр</a></div>
+            </div>
+
+            <div class="row mt-2">  <!-- check curator -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Куратор:</div>
+                <div class="text-black-50 col-6 col-sm-9">
+                    {% if user.is_staff %}
+                        <a href="{{ check.curator.get_absolute_url }}">{{ check.curator.get_full_name }}</a>
+                    {% else %}
+                        {{ check.curator.get_full_name }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row mt-2"> <!-- check comment -->
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Комментарий:</div>
+                <div class="text-black-50 col-6 col-sm-9">{{ check.comment }}</div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

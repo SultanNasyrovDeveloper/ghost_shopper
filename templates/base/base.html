@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	{% block meta %}
+
+	{% endblock %}
+
+	<!-- Global stylesheets -->
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'assets/css/icons/icomoon/styles.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap_limitless.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/colors.min.css' %}">
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+    <script src="{% static 'assets/js/main/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/main/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/loaders/blockui.min.js' %}"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+    <script src="{% static 'assets/js/plugins/visualization/d3/d3.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/visualization/d3/d3_tooltip.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/forms/styling/switchery.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/ui/moment/moment.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/ui/perfect_scrollbar.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/loaders/progressbar.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+	<!-- /theme JS files -->
+
+    {% block css %}
+
+    {% endblock %}
+
+</head>
+
+<body>
+
+	<!-- NAVBAR-->
+	<div class="navbar navbar-expand-md navbar-dark" style="background: #808080;">
+
+        <!-- NAVBAR LOGO -->
+        <div class="navbar-brand wmin-200">
+            {% block logo %}
+
+            {% endblock %}
+		</div><!-- /NAVBAR LOGO -->
+
+        {% block navbar %}
+
+        {% endblock %}
+
+	</div><!-- /NAVBAR-->
+
+
+	<!-- PAGE HEADER -->
+	<div class="page-header">
+
+		<div class="page-header-content header-elements-md-inline">
+			<div class="page-title d-flex">
+                {% if request.META.HTTP_REFERER %}
+                    <div class="back-button d-flex align-items-center mr-2">
+                        <a href="{{ request.META.HTTP_REFERER  }}">
+                            <i class="icon-previous icon-2x text-black-50"></i>
+                        </a>
+                    </div>
+                {% endif %}
+
+				<h3 class="text-black-50">
+                    {% block page-header %}
+
+				    {% endblock %}
+                </h3>
+				<a href="#" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
+			</div>
+
+			<div class="header-elements d-none mb-3 mb-md-0">
+			    {% block header-buttons %}
+
+			    {% endblock %}
+			</div>
+		</div>
+	</div><!-- /PAGE HEADER -->
+
+
+	<!-- PAGE CONTENT -->
+	<div class="page-content pt-0">
+
+        {% block sidebar %}
+
+        {% endblock %}
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<!-- Content area -->
+			<div class="content">
+
+                {% block content %}
+                
+                {% endblock %}
+
+
+			</div>
+			<!-- /content area -->
+
+		</div>
+		<!-- /main content -->
+
+	</div><!-- /PAGE CONTENT -->
+
+
+	<!-- FOOTER -->
+	<div class="navbar navbar-expand-lg navbar-light">
+		<div class="text-center d-lg-none w-100">
+			<button type="button" class="navbar-toggler dropdown-toggle" data-toggle="collapse" data-target="#navbar-footer">
+				<i class="icon-unfold mr-2"></i>
+				Footer
+			</button>
+		</div>
+
+		<div class="navbar-collapse collapse d-flex justify-content-center" id="navbar-footer">
+			<span class="navbar-text">
+				&copy; <span class="current-year"></span> {{ index_page.company_name }}
+			</span>
+
+		</div>
+	</div>
+	<!-- /FOOTER -->
+
+
+    {% block loader %}
+
+    {% endblock %}
+
+    <script>
+        const currentYear = new Date().getFullYear();
+        $('.current-year').html(currentYear)
+    </script>
+
+    {% block script %}
+    
+    {% endblock %}
+
+</body>
+</html>

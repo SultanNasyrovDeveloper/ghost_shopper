@@ -1,0 +1,304 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>{{ organisation.title }}</title>
+{% endblock %}
+
+
+{% block header-buttons %}
+    <a href="{% url 'organisation:create-employee' organisation.id %}" class="btn btn-primary m-1">Создать сотрудника</a>
+    {% if organisation.level == 0 %}
+        <button data-target="#child-node-create-modal" data-toggle="modal" class="btn btn-primary m-1">Создать подразделение</button>
+    {% elif organisation.level == 1 %}
+        <button data-target="#child-node-create-modal" data-toggle="modal" class="btn btn-primary m-1">Создать отдел</button>
+    {% endif %}
+
+    <a href="{% url 'organisation:update' organisation.id %}" class="btn btn-primary m-1">Редактировать</a>
+    <a href="{% url 'organisation:delete' organisation.id %}" class="btn btn-danger m-1">Удалить</a>
+{% endblock %}
+
+{% block css %}
+
+    <style>
+        .border-radius-sm{border-radius: 3px;}
+        .location:hover, .department:hover, .employee:hover{background-color: #eeeeee !important;}
+        .header-elements > .button:hover{background-color: #eeeeee !important;}
+        .comments{
+            display: flex;
+            flex-direction: column-reverse;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- ORGANISATION NAME -->
+    <div class="card col mr-1">
+        <div class="card-header header-elements-inline">
+            <h2 class="font-weight-bold text-black-50">{{ organisation.name }}</h2>
+            <div class="header-elements">
+                <div class="docs-link-container d-flex">  <!--organisation statistics header inline link -->
+                    <a href="{% url 'organisation:statistics' organisation.id %}" title="Статистика" class="mr-2 btn btn-light">
+                        <i class="icon-stats-bars2" style="font-size: 1.3rem"></i>
+                    </a>
+                    <a href="{% url 'organisation:docs' organisation.get_root.id %}" class="btn btn-light" title="Документы">
+                        <i class="icon-newspaper2" style="font-size: 1.3rem"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div><!-- /ORGANISATION NAME -->
+
+
+    <!-- DEPARTMENTS AND EMPLOYEES CONTAINER -->
+    <div class="container-fluid">
+        <div class="row">
+
+            {% if organisation.level == 0 %}
+                <!-- DEPARTMENT -->
+                <div class="card col-12 col-sm-6 mr-1">
+                    <div class="card-header">
+                        <h4 class="font-weight-bold text-black-50">Подразделения</h4>
+                    </div>
+
+                    <div class="card-body">
+                        {% for location in organisation.get_children %}
+                            <a class="location row bg-light mb-2 p-2" href="{{ location.get_absolute_url }}">
+                                <div class="col-12 col-md-4 text-black-50">{{ location.name }}</div>
+                                <div class="col-12 col-md-4 text-black-50">{{ location.city.name }}</div>
+                                <div class="col-12 col-md-4 text-black-50">{{ location.address }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% elif organisation.level == 1 %}
+                <div class="card col mr-1">
+                    <div class="card-header">
+                        <h4 class="font-weight-bold text-black-50">Отделы</h4>
+                    </div>
+
+                    <div class="card-body">
+                        {% for department in organisation.get_children %}
+                            <a class="department row bg-light mb-2 p-2" href="{{ department.get_absolute_url }}">
+                                <div class="col-12 col-md-4 text-black-50">{{ department.name }}</div>
+                                <div class="col-12 col-md-4 text-black-50">{{ department.parent.city.name }}</div>
+                                <div class="col-12 col-md-4 text-black-50">{{ department.parent.address }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- /DEPARTMENT -->
+            {% endif %}
+
+
+            <!-- EMPLOYEES -->
+            <div class="employees card col mr-1">
+                <div class="card-header">
+                    <h4 class="font-weight-bold text-black-50">Сотрудники</h4>
+                </div>
+                <div class="card-body">
+                    {% for employee_profile in organisation.employee_profiles.all %}
+                        <a href="{{ employee_profile.user.get_absolute_url }}" class="employee bg-light row mb-2 p-2">
+                            <div class="col-12 col-md-4 text-black-50">{{ employee_profile.user.get_full_name }}</div>
+                            <div class="col-12 col-md-4 text-black-50">{{ employee_profile.user.email }}</div>
+                            <div class="col-12 col-md-4 text-black-50">{{ employee_profile.user.phone_number }}</div>
+                        </a>
+                    {% endfor %}
+
+                </div>
+            </div><!-- EMPLOYEES -->
+
+        </div>
+
+    </div><!-- /DEPARTMENTS AND EMPLOYEES CONTAINER -->
+
+
+    <div class="wall">
+        <!-- WALL -->
+        <div class="card">
+            <div class="card-body">
+                <form action="{% url 'chat:create-message' organisation.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-2 col-sm-1">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" class="rounded-circle" width="42" height="42" alt="">
+                                {% else %}
+                                    <img src="{% static 'assets/images/placeholders/placeholder.jpg' %}" class="rounded-circle" width="42" height="42" alt="">
+                                {% endif %}
+                            </div>
+                            <div class="col-8 col-sm-10">
+                                {{ message_form }}
+                            </div>
+                            <div class="col-2 col-sm-1">
+                                <button type="submit" class="btn bg-transparent"><i class="icon-paperplane icon-2x text-primary"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% for message in chat.messages.all %}
+            <!-- MESSAGE -->
+            <div class="card message card-collapsed">
+
+                <!-- MESSAGE TEXT -->
+                <div class="card-header bg-white">
+                    <div class="media">
+                        <div class="mr-3">
+                            <a href="{{ message.author.get_absolute_url }}">
+                                {% if message.author.avatar %}
+                                    <img src="{{ message.author.avatar.url }}" class="rounded-circle" width="42" height="42" alt="">
+                                {% else %}
+                                    <img src="{% static 'assets/images/placeholders/placeholder.jpg' %}" class="rounded-circle" width="42" height="42" alt="">
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h6 class="media-title">
+                                <a href="{{ message.author.get_absolute_url }}">{{ message.author.get_full_name }}</a>
+                            </h6>
+                            <span class="font-size-lg">{{ message.body }}</span>
+
+                        </div>
+                    </div>
+                    <div class="d-flex ml-5">
+                        <div class="date d-flex align-items-center"><span class="text-black-50">{{ message.created|date:'d.m.Y H:i' }}</span></div>
+                        <a data-action="collapse" class="d-flex align-items-center ml-3"><i></i></a>
+                        {% if message.author == user %}
+                            <li class="list-inline-item ml-3">
+                                <form action="{% url 'chat:delete-message' message.id %}" method="post" class="delete-message">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn bg-transparent"><i class="icon-trash text-danger"></i> </button>
+                                </form>
+                            </li>
+                        {% elif user.is_staff %}
+                            <li class="list-inline-item ml-3">
+                                <form class="delete-message" action="{% url 'chat:delete-message' message.id %}" method="post" class="delete-message">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn bg-transparent"><i class="icon-trash text-danger"></i> </button>
+                                </form>
+                            </li>
+                        {% endif %}
+                    </div>
+                </div><!-- /MESSAGE TEXT -->
+
+                <!-- MESSAGE COMMENTS -->
+                <div class="card-body p-0">
+
+                    <!-- comments container -->
+                    <div class="comments ml-3 p-2">
+                        {% for comment in message.comments.all %}
+                            <div class="media comment">
+                                <div class="mr-3">
+                                    <a href="{{ comment.author.get_absolute_url }}">
+                                        {% if comment.author.avatar %}
+                                            <img src="{{ comment.author.avatar.url }}" class="rounded-circle" width="42" height="42" alt="">
+                                        {% else %}
+                                            <img src="{% static 'assets/images/placeholders/placeholder.jpg' %}" class="rounded-circle" width="42" height="42" alt="">
+                                        {% endif %}
+                                    </a>
+                                </div>
+
+                                <div class="media-body">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{{ comment.author.get_absolute_url }}">{{ comment.author.get_full_name }}</a>
+                                    </div>
+                                    {{ comment.body }}
+                                    <div class="d-flex">
+                                        <span class="font-size-sm text-muted d-flex align-items-center">{{ comment.created|date:'d.m.Y H:i' }}</span>
+
+                                        {% if comment.author == user %}
+                                            <form class="delete-comment" action="{% url 'chat:delete-comment' comment.id %}">
+                                                <button type="submit" class="btn bg-transparent"><i class="icon-trash text-danger"></i></button>
+                                            </form>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div><!-- comments container -->
+
+
+                </div><!-- MESSAGE COMMENTS -->
+
+                <!-- MESSAGE DATE AND DELETE BUTTON -->
+                <div class="card-footer d-flex justify-content-between">
+                    <!-- comments form -->
+                    <div class="comment-form-container container-fluid">
+                        <form action="{% url 'chat:create-comment' %}" class="comment-form">
+                            {% csrf_token %}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-2 col-sm-1">
+                                        {% if user.avatar %}
+                                            <img src="{{ user.avatar.url }}" class="rounded-circle" width="42" height="42" alt="">
+                                        {% else %}
+                                            <img src="{% static 'assets/images/placeholders/placeholder.jpg' %}" class="rounded-circle" width="42" height="42" alt="">
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-8 col-sm-10">
+                                        {{ comment_form.author }}
+                                        {{ comment_form.body }}
+                                        <input type="hidden" name="message" id="id_message" value="{{ message.id }}">
+                                    </div>
+                                    <div class="col-2 col-sm-1">
+                                        <button type="submit" class="btn bg-transparent"><i class="icon-paperplane icon-2x text-primary"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+                </div><!-- /MESSAGE DATE AND DELETE BUTTON -->
+            </div><!-- /MESSAGE -->
+        {% endfor %}
+
+    </div>
+
+    <!-- CHILD ORGANISATION NODE CREATE FORM MODAL -->
+    <div id="child-node-create-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {% if organisation.level == 0 %}
+                            Создать подразделение
+                        {% elif organisation.level == 1 %}
+                            Создать отдел
+                        {% endif %}
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <form action="" method="post" id="child-node-create-form">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link legitRipple" data-dismiss="modal">Закрыть</button>
+                    <input type="submit" class="btn bg-primary legitRipple" form="child-node-create-form" value="Создать">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+{% block script %}
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{% static 'js/organisation/detail.js' %}"></script>
+{% endblock %}

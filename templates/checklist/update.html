@@ -1,0 +1,336 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+{% block meta %}
+    <title>Редактировать чек-лист</title>
+{% endblock %}
+
+
+{% block page-header %}
+    <a href="{{ checklist.check_obj.get_absolute_url }}">{{ checklist.check_obj.title }}</a> / Редактировать чек-лист
+{% endblock %}
+
+
+{% block css %}
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.5.6/plyr.css" />
+    <style>
+        .image-card{
+            height: 50px;
+            width: 100px;
+        }
+        .answer-container > ul{
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .answer-container > ul > li > label{
+            display: flex;
+            align-items: center;
+            margin: 0 0.5rem;
+        }
+
+
+    </style>
+{% endblock %}
+
+
+{% block header-buttons %}
+    <input type="submit" form="checklist-form" value="Сохранить" class="btn btn-primary">
+{% endblock %}
+
+
+{% block content %}
+    <form method="post" id="checklist-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- HEADER -->
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-column">
+                    <h3 class="text-black-50 font-weight-bold">Редактировать чек-лист</h3>
+                    <div>Дата визита: {{ form.visit_date }}</div>
+                    <div>
+                        {% if form.non_field_errors %}
+                            <span class="text-danger">{{ form.non_field_errors.as_text }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- /HEADER -->
+
+
+        <!-- LOAD AUDIO -->
+        <div class="card load-audio {% if not checklist_is_valid and not checklist.audio %}border-1 border-danger{% endif %}">
+            <div class="card-header"><h5>Загрузить аудио</h5></div>
+            <div class="card-body p-3">
+                {% if checklist.audio %}
+                    <audio controls class="w-100">
+                        <source src="{% url 'checklist:audio' checklist.id %}" type="audio/mp3" />
+                    </audio>
+                {% else %}
+                    <span class="">Аудиофайл не был загружен</span>
+                {% endif %}
+
+
+                {% if form.audio.errors %}
+                    <span class="text-danger">{{ form.audio.errors.as_text }}</span>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                {{ form.audio }}
+            </div>
+        </div><!-- //LOAD AUDIO -->
+
+
+        <!-- LOAD IMAGES -->
+        <div class="card">
+            <div class="card-header"><h5>Загрузить изображения</h5></div>
+
+            <div class="card-body d-flex">
+                {% for image in checklist.images.all %}
+                    <div class="card image-card m-1">
+                        <div class="card-img-actions overflow-hidden">
+                            <img class="card-img-top img-fluid" src="{{ image.file.url }}" alt="">
+                            <div class="card-img-actions-overlay card-img-top">
+                                <a href="{% url 'checklist:delete-image'  %}" class="delete-image cursor-pointer" data-id="{{ image.id }}"><i class="icon-x text-danger"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if form.images.errors %}
+                    <div><span class="text-danger">{{ form.images.errors.as_text }}</span></div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                {{ form.images }}
+            </div>
+        </div><!-- LOAD IMAGES -->
+
+
+        {% for section_name, section in formset.items %}
+
+            <!-- SECTION FORM CARD -->
+            <div class="card">
+
+                <!-- SECTION NAME -->
+                <div class="card-header ml-3">
+                    <h4>{{ section_name }}</h4>
+                </div><!-- SECTION NAME -->
+
+
+                <!-- SECTION QUESTIONS CONTAINER -->
+                <div class="card-body">
+                    {% for question, answer_form in section.questions.items %}
+                        <div class="question mb-1 row bg-light m-1 p-2 {% if checklist_is_valid is False and not answer_form.instance.question.is_answered %}border-1 border-danger{% endif %}">
+                            <div class="col-md-6 d-flex flex-column justify-content-center"> <!-- question -->
+                                <div class="col d-flex text-black-50">
+                                    <div>{{ counter.increment }}<span> - </span></div> <div>{{ question|safe }}</div>
+                                </div>
+                                {% if answer_form.non_field_errors %}
+                                    <span class="text-danger-400">{{ answer_form.non_field_errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /question -->
+
+                            <div class="col-md-3 answer-container d-flex flex-column justify-content-center"><!-- answer -->
+                                {{ answer_form.answer }}
+                                {% if answer_form.answer.errors %}
+                                    <span class="text-danger-400">{{ answer_form.answer.errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /answer -->
+
+                            <div class="col-md-3 d-flex flex-column justify-content-center"><!-- comment -->
+                                {{ answer_form.performer_comment }}
+                                {% if answer_form.performer_comment.errors %}
+                                    <span class="text-danger-400">{{ answer_form.performer_comment.errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /comment -->
+
+
+                            {% if user.is_staff %}
+                                <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal -->
+                                    {{ answer_form.appeal_comment }}
+                                    {% if answer_form.appeal_comment.errors %}
+                                        <span class="text-danger-400">{{ answer_form.appeal_comment.errors.as_text }}</span>
+                                    {% endif %}
+                                </div><!-- /appeal -->
+
+                                <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal answer -->
+                                    {{ answer_form.appeal_answer }}
+                                    {% if answer_form.appeal_answer.errors %}
+                                        <span class="text-danger-400">{{ answer_form.appeal_answer.errors.as_text }}</span>
+                                    {% endif %}
+                                </div><!-- appeal answer -->
+
+                            {% elif user.is_performer %}
+                                {% if checklist.check_obj.was_appealed %}
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal -->
+                                        {{ answer_form.appeal_comment.value }}
+                                    </div><!-- /appeal -->
+
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal answer -->
+                                        {{ answer_form.appeal_answer }}
+                                        {% if answer_form.appeal_answer.errors %}
+                                            <span class="text-danger-400">{{ question_form.appeal_answer.errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- appeal answer -->
+                                {% endif %}
+
+                            {% elif user.is_customer %}
+                                {% if checklist.check_obj.was_appealed %}
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal -->
+                                        {{ answer_form.appeal_comment }}
+                                        {% if answer_form.appeal_comment.errors %}
+                                            <span class="text-danger-400">{{ answer_form.appeal_comment.errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- /appeal -->
+
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal answer -->
+                                        {{ answer_form.appeal_answer.value }}
+                                    </div><!-- appeal answer -->
+                                {% endif %}
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+
+                    {% for subsection_name, subsection in section.subsections.items %}
+                        <div class="subsection mt-3">
+                            <div class="ml-3 d-flex align-items-center">
+                                <h5>{{ subsection_name }} <span class="text-black-50 font-size-sm">(подсекция)</span></h5>
+                            </div>
+
+                            {% for question, answer_form in subsection.items %}
+                                <div class="question mb-1 row bg-light m-1 p-2 {% if checklist_is_valid is False and not answer_form.instance.question.is_answered %}border-1 border-danger{% endif %}">
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"> <!-- question -->
+                                    <span>{{ counter.increment }} - {{ question|safe }}</span>
+                                    {% if answer_form.non_field_errors %}
+                                        <span class="text-danger-400">{{ answer_form.non_field_errors.as_text }}</span>
+                                    {% endif %}
+                                </div><!-- /question -->
+
+                                <div class="col-md-3 answer-container d-flex flex-column justify-content-center"><!-- answer -->
+                                    {{ answer_form.answer }}
+                                    {% if answer_form.answer.errors %}
+                                        <span class="text-danger-400">{{ answer_form.answer.errors.as_text }}</span>
+                                    {% endif %}
+                                </div><!-- /answer -->
+
+                                <div class="col-md-3 d-flex flex-column justify-content-center"><!-- comment -->
+                                    {{ answer_form.performer_comment }}
+                                    {% if answer_form.performer_comment.errors %}
+                                        <span class="text-danger-400">{{ answer_form.performer_comment.errors.as_text }}</span>
+                                    {% endif %}
+                                </div><!-- /comment -->
+
+
+                                {% if user.is_staff %}
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal -->
+                                        {{ answer_form.appeal_comment }}
+                                        {% if answer_form.appeal_comment.errors %}
+                                            <span class="text-danger-400">{{ answer_form.appeal_comment.errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- /appeal -->
+
+                                    <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal answer -->
+                                        {{ answer_form.appeal_answer }}
+                                        {% if answer_form.appeal_answer.errors %}
+                                            <span class="text-danger-400">{{ answer_form.appeal_answer.errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- appeal answer -->
+
+                                {% elif user.is_performer %}
+                                    {% if checklist.check_obj.was_appealed %}
+                                        <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal -->
+                                            {{ answer_form.appeal_comment.value }}
+                                        </div><!-- /appeal -->
+
+                                        <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal answer -->
+                                            {{ answer_form.appeal_answer }}
+                                            {% if answer_form.appeal_answer.errors %}
+                                                <span class="text-danger-400">{{ question_form.appeal_answer.errors.as_text }}</span>
+                                            {% endif %}
+                                        </div><!-- appeal answer -->
+                                    {% endif %}
+
+                                {% elif user.is_customer %}
+                                    {% if checklist.check_obj.was_appealed %}
+                                        <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal -->
+                                            {{ answer_form.appeal_comment }}
+                                            {% if answer_form.appeal_comment.errors %}
+                                                <span class="text-danger-400">{{ answer_form.appeal_comment.errors.as_text }}</span>
+                                            {% endif %}
+                                        </div><!-- /appeal -->
+
+                                        <div class="col-md-6 d-flex flex-column justify-content-center"><!-- appeal answer -->
+                                            {{ answer_form.appeal_answer.value }}
+                                        </div><!-- appeal answer -->
+                                    {% endif %}
+                                {% endif %}
+
+                        </div>
+                            {% endfor %}
+
+                        </div>
+                    {% endfor %}
+                </div><!-- /SECTION QUESTIONS CONTAINER -->
+
+
+            </div><!-- SECTION FORM CARD -->
+
+        {% endfor %}
+    </form>
+
+{% endblock %}
+
+
+{% block script %}
+    <script src="{% static 'plugins/axios/axios.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+    <script>
+        let options = {
+            monthsFull: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            weekdaysFull: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            format: 'yyyy-mm-dd'
+        };
+        $('.pickadate').pickadate(options);
+
+        $('.status-checkbox-input').on('click', function () {
+            console.log('Clicked');
+            console.log($('this').prop('indeterminate', true));
+        })
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            axios.defaults.xsrfCookieName = 'csrftoken';
+            axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+            let deleteImage = async function (imageId, url) {
+                try {
+                    const { data } = await axios.post(url, {image_id: imageId});
+                    return data;
+                } catch (e) {
+                    console.log(e);
+                    return {};
+                }
+            };
+
+            $('.delete-image').on('click', async function (e) {
+                e.preventDefault();
+                const url = $(this).attr('href')
+                const imageId = $(this).attr('data-id');
+                let response = await deleteImage(imageId, url);
+                if (response.status === 200) {
+                    let imageCard = $(this).closest('.image-card').remove()
+                }
+            });
+
+        })
+    </script>
+{% endblock %}

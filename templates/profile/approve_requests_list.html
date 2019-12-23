@@ -1,0 +1,27 @@
+{% extends 'base/base_app.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">Список запросов на одобрение тайных покупателей</h3>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-body">
+            <div class="request-list row">
+                {% for request in requests %}
+                    <a class="col-sm-12 bg-light m-1 p-2 font-weight-bold text-black-50 cursor-pointer" href="{{ request.performer_profile.user.get_absolute_url }}">
+                        {{ request.performer_profile.user.get_full_name }}
+                    </a>
+
+                {% empty %}
+                    <span class="m-2 font-weight-bold text-black-50">На данный момент нет запросов на подтверждение профилей</span>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+{% block meta %}
+    <title>{{ page_title }}</title>
+{% endblock %}
+
+
+{% block css %}
+    {{ form.media }}
+    <style>
+
+        .select2-container{
+            width: 100%;
+            min-width: 100% !important;
+        }
+
+        .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
+            border-radius: 0!important;
+            display: flex;
+            align-items: center;
+
+            height: auto!important;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+
+{% block page-header %}
+    {% if user.is_staff %}<a href="{% url 'check:list' %}">Список проверок</a>{% endif %} / {{ page_title }}
+{% endblock %}
+
+
+{% block header-buttons %}
+    <input type="submit" value="Сохранить" class="btn btn-primary" form="check-create-form">
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+
+        <div class="card-header">
+            <h3 class="text-black-50 font-weight-bold">{{ page_title }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" id="check-create-form">
+                {% csrf_token %}
+
+                <div class="non-field-errors"> <!-- non field errors -->
+                    {% if user_form.non_field_errors %}
+                        <span class="text-danger-400">{{ form.non_field_errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- non field errors -->
+
+                <div class="form-group row"><!-- status -->
+                    <label class="col-12 col-lg-3 text-black-50 font-weight-bold" for="{{ form.status.id_for_label }}">{{ form.status.label }} :</label>
+                    <div class="col-12 col-lg-9 d-flex row">
+                        {{ form.status }}
+                    </div>
+                    {% if form.status.errors %}
+                        <span class="text-danger-400">{{ form.status.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /status-->
+
+                <div class="form-group row"><!-- kind -->
+                    <label class="col-12 col-lg-3 text-black-50 font-weight-bold" for="{{ form.status.id_for_label }}">
+                        {{ form.kind.label }} :
+                    </label>
+                    <div class="col-12 col-lg-9 d-flex row">
+                        {{ form.kind }}
+                    </div>
+                    {% if form.kind.errors %}
+                        <span class="text-danger-400">{{ form.kind.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /kind-->
+
+                <div class="form-group row"><!-- start date -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.start_date.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.start_date }}</div>
+                    {% if form.start_date.errors %}
+                        <span class="text-danger-400">{{ form.start_date.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /start date-->
+
+                <div class="form-group row"><!-- deadline -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.deadline.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.deadline }}</div>
+                    {% if form.deadline.errors %}
+                        <span class="text-danger-400">{{ form.deadline.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /deadline-->
+
+                <div class="form-group row"><!-- target -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.target.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.target }}</div>
+                    {% if form.target.errors %}
+                        <span class="text-danger-400">{{ form.target.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /target-->
+
+                <div class="form-group row"><!-- instruction -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.instruction.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.instruction }}</div>
+                    {% if form.instruction.errors %}
+                        <span class="text-danger-400">{{ form.instruction.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /instruction-->
+
+                <div class="form-group row"><!-- performer -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.performer.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.performer }}</div>
+                    {% if form.performer.errors %}
+                        <span class="text-danger-400">{{ form.performer.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /performer-->
+
+                <div class="form-group row"><!-- curator -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.curator.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.curator }}</div>
+                    {% if form.curator.errors %}
+                        <span class="text-danger-400">{{ form.curator.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /curator-->
+
+                <div class="form-group row"><!-- reward -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.reward.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.reward }}</div>
+                    {% if form.reward.errors %}
+                        <span class="text-danger-400">{{ form.reward.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /reward-->
+
+                <div class="form-group row"><!-- conformation_period -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.conformation_period.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.conformation_period }}</div>
+                    {% if form.conformation_period.errors %}
+                        <span class="text-danger-400">{{ form.conformation_period.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /conformation_period-->
+
+                <div class="form-group row"><!-- comment -->
+                    <label class="col-12 col-form-label col-lg-3 text-black-50 font-weight-bold">{{ form.comment.label }}:</label>
+                    <div class="col-12 col-lg-9">{{ form.comment }}</div>
+                    {% if form.comment.errors %}
+                        <span class="text-danger-400">{{ form.comment.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /comment-->
+
+            </form>
+
+        </div>
+    
+    {% if check %}
+    
+    {% endif %}
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+    <script>
+        let options = {
+            monthsFull: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            weekdaysFull: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            format: 'yyyy-mm-dd'
+        };
+        $('.pickadate').pickadate(options);
+
+        $('.status-checkbox-input').on('click', function () {
+            console.log('Clicked');
+            console.log($('this').prop('indeterminate', true));
+        })
+
+    </script>
+{% endblock %}

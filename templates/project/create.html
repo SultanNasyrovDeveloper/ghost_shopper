@@ -1,0 +1,164 @@
+{% extends 'base/base_app.html' %}
+{% load static %}
+
+{% block page-header %}
+    Создание нового проекта
+{% endblock %}
+
+{% block css %}
+    <style>
+        .select2-container{
+            width: 100% !important;
+        }
+
+        .select2-selection--single{
+            background-clip: border-box;
+            border: 1px solid #ddd !important;
+            border-top-color: transparent!important;
+            border-radius: 0!important;
+
+
+            height: 40px !important;
+            width: 100% !important;
+        }
+
+        .select2-dropdown--below{
+            width: 50vw;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+
+        .select2-selection__arrow{
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block header-buttons %}
+    <input class="btn btn-info" type="submit" value="Сохранить" form="project-form">
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-header"><h2>Создать проект</h2></div>
+        <div class="card-body">
+            <form method="post" id="project-form">
+                {% csrf_token %}
+
+                <div class="non-field-errors"> <!-- non field errors -->
+                    {% if user_form.non_field_errors %}
+                        <span class="text-danger-400">{{ project_form.non_field_errors.as_text }}</span>
+                    {% endif %}
+                    {% if check_template_form.non_field_errors %}
+                        <span class="text-danger-400">{{ check_template_form.non_field_errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- non field errors -->
+
+                <div class="form-group row"><!-- project name -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ project_form.name.label }}:</label>
+                    <div class="col-lg-9">{{ project_form.name }}</div>
+                    {% if project_form.name.errors %}
+                        <span class="text-danger-400">{{ project_form.name.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /project name-->
+
+                <div class="form-group row"><!-- project targets -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ project_form.targets.label }}:</label>
+                    <div class="col-lg-9">{{ project_form.targets }}</div>
+                    {% if project_form.targets.errors %}
+                        <span class="text-danger-400">{{ project_form.targets.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /project targets-->
+
+                <div class="form-group row"><!-- check kind -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Тип:</label>
+                    <div class="col-lg-9">{{ check_template_form.kind }}</div>
+                    {% if project_form.targets.errors %}
+                        <span class="text-danger-400">{{ check_template_form.kind.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check kind-->
+
+                <div class="form-group row"><!-- check start_date -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.start_date.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.start_date }}</div>
+                    {% if check_template_form.start_date.errors %}
+                        <span class="text-danger-400">{{ check_template_form.start_date.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check start_date-->
+
+                <div class="form-group row"><!-- check deadline -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.deadline.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.deadline }}</div>
+                    {% if check_template_form.deadline.errors %}
+                        <span class="text-danger-400">{{ check_template_form.deadline.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check deadline-->
+
+                <div class="form-group row"><!-- check curator -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.curator.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.curator }}</div>
+                    {% if check_template_form.curator.errors %}
+                        <span class="text-danger-400">{{ check_template_form.curator.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check curator-->
+
+                <div class="form-group row"><!-- check instruction -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.instruction.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.instruction }}</div>
+                    {% if check_template_form.instruction.errors %}
+                        <span class="text-danger-400">{{ check_template_form.instruction.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check instruction-->
+
+                <div class="form-group row"><!-- check reward -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.reward.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.reward }}</div>
+                    {% if check_template_form.reward.errors %}
+                        <span class="text-danger-400">{{ check_template_form.reward.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check reward-->
+
+                <div class="form-group row"><!-- check conformation_period -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.conformation_period.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.conformation_period }}</div>
+                    {% if check_template_form.conformation_period.errors %}
+                        <span class="text-danger-400">{{ check_template_form.conformation_period.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check conformation_period-->
+
+                <div class="form-group row"><!-- check comment -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">{{ check_template_form.comment.label }}:</label>
+                    <div class="col-lg-9">{{ check_template_form.comment }}</div>
+                    {% if check_template_form.comment.errors %}
+                        <span class="text-danger-400">{{ check_template_form.comment.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /check reappeal_period-->
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    {{ project_form.media }}
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+    <script>
+        let options = {
+            monthsFull: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            weekdaysFull: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            format: 'yyyy-mm-dd'
+        };
+        $('.pickadate').pickadate(options);
+
+    </script>
+
+{% endblock %}

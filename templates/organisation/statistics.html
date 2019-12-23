@@ -1,0 +1,172 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>Статистика организации</title>
+{% endblock %}
+
+{% block css %}
+    <style>
+        .multiselect-native-select{
+            width: 100%;
+        }
+    </style>
+    <script src="{% static 'assets/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+    <!-- PAGE TITLE -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">Статистика организации</h3>
+        </div>
+    </div><!-- /PAGE TITLE -->
+
+
+    <!-- FILTERS -->
+    <div class="card">
+        <form action="" method="get">
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-2 mt-2"><!-- nodes -->
+                                <label class="text-black-50 font-weight-bold">{{ filter.form.nodes.label }}:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.nodes }}</div>
+                                {% if filter.form.nodes.errors %}
+                                    <span class="text-danger-400">{{ filter.form.nodes.errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /nodes-->
+                            <div class="mb-2 mt-2"><!-- kind -->
+                                <label class="text-black-50 font-weight-bold">{{ filter.form.kind.label }}:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.kind }}</div>
+                                {% if filter.form.kind.errors %}
+                                    <span class="text-danger-400">{{ filter.form.kind.errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /kind-->
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-2 mt-2"><!-- visit date gte -->
+                                <label class="text-black-50 font-weight-bold">{{ filter.form.visit_date__gte.label }}:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.visit_date__gte }}</div>
+                                {% if filter.form.visit_date__gte.errors %}
+                                    <span class="text-danger-400">{{ filter.form.visit_date__gte.errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /visit date gte -->
+
+                            <div class="mb-2 mt-2"><!-- visit date lte -->
+                                <label class="text-black-50 font-weight-bold">{{ filter.form.visit_date__lte.label }}:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.visit_date__lte }}</div>
+                                {% if filter.form.visit_date__lte.errors %}
+                                    <span class="text-danger-400">{{ filter.form.visit_date__lte.errors.as_text }}</span>
+                                {% endif %}
+                            </div><!-- /visit date lte-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-center">
+                <a class="btn bg-grey-300 m-1" href="{% url 'organisation:statistics' organisation.id %}">Очистить</a>
+                <input type="submit" class="btn btn-dark m-1" value="Отправить">
+            </div>
+        </form>
+    </div>
+
+    <!-- OVERALL STATISTICS -->
+    <div class="overall-statistics-container card">
+        <div class="card-header">
+            <h5 class="font-weight-bold text-black-50">
+                Общая статистика
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-bordered table-striped mt-1 w-100">
+                <thead>
+                <tr class="bg-grey-300">
+                    <th>Название блока</th>
+                    <th>Макс.</th>
+                    <th>Получено</th>
+                    <th>%</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-light">
+                        <td>Все блоки</td>
+                        <td>{{ statistics.overall.points_total }}</td>
+                        <td>{{ statistics.overall.points }}</td>
+                        <td>{{ statistics.overall.percentage }} %</td>
+                    </tr>
+                    {% for section_name, section_data in statistics.overall.sections.items %}
+                        <tr class="bg-light">
+                            <td>{{ section_name }}</td>
+                            <td>{{ section_data.points_total }}</td>
+                            <td>{{ section_data.points }}</td>
+                            <td>{{ section_data.percentage }} %</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /OVERALL STATISTICS -->
+
+    <!-- SECTION BY STATISTICS -->
+    {% for node_name, node_data in statistics.nodes.items %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="font-weight-bold text-black-50">{{ node_name }}</h5>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered table-striped mt-1 w-100">
+                    <thead>
+                        <tr class="bg-grey-300">
+                            <th>Название блока</th>
+                            <th>Макс.</th>
+                            <th>Получено</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-light">
+                            <td>Все блоки</td>
+                            <td>{{ node_data.points_total }}</td>
+                            <td>{{ node_data.points }}</td>
+                            <td>{{ node_data.percentage }} %</td>
+                        </tr>
+                        {% for section_name, section_data in node_data.sections.items %}
+                            <tr class="bg-light">
+                                <td>{{ section_name }}</td>
+                                <td>{{ section_data.points_total }}</td>
+                                <td>{{ section_data.points }}</td>
+                                <td>{{ section_data.percentage }} %</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+    <script>
+        let options = {
+            monthsFull: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            weekdaysFull: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            format: 'yyyy-mm-dd'
+        };
+        $('.pickadate').pickadate(options);
+        $('.multiselect').multiselect({nonSelectedText: 'Выбрать'});
+    </script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>Вход в аккаунт</title>
+{% endblock %}
+
+{% block logo %}
+    <a href="{% url 'index_page:index' %}" class="d-inline-block">
+        {% if index_page.logo %}
+            <img src="{{ index_page.logo.url }}" alt="">
+        {% endif %}
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="content d-flex justify-content-center align-items-center">
+
+        <!-- LOGIN FORM -->
+        <form class="login-form" method="post">
+            {% csrf_token %}
+            <div class="card mb-0">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <i class="icon-user icon-2x text-slate-300 border-slate-300 border-3 rounded-round p-3 mb-3 mt-1"></i>
+                        <h5 class="mb-0 text-black-50 font-weight-bold">Вход в аккаунт</h5>
+                        {% if form.errors %}
+                            <span class="text-danger-400">Введено неверное имя пользователя или пароль. Попробуйте еще раз</span>
+                        {% elif next and user.is_authenticated %}
+                            <span class="text-danger-400">У вашего аккаунта недостаточно прав для просмотра данной страницы. Пожалуйста, войдите в систему под другим пользователем</span>
+                        {% else %}
+                            <span class="d-block text-black-50">Введите данные для входа в акккаунт</span>
+                        {% endif %}
+
+                    </div>
+                    <div class="form-group form-group-feedback form-group-feedback-left">
+                        {{ form.username }}
+                        <div class="form-control-feedback">
+                            <i class="icon-user text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-feedback form-group-feedback-left">
+                        {{ form.password }}
+                        <div class="form-control-feedback">
+                            <i class="icon-lock2 text-muted"></i>
+                        </div>
+                    </div>
+
+                    <input name="next" type="hidden" value="{{ next }}">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block legitRipple">Войти <i class="icon-circle-right2 ml-2"></i></button>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="{% url 'auth:reset-password' %}">Забыли пароль?</a>
+                    </div>
+                </div>
+            </div>
+        </form><!-- /LOGIN FORM -->
+
+    </div>
+{% endblock %}
+

@@ -1,0 +1,284 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>Назначить исполнителя</title>
+{% endblock %}
+
+{% block css %}
+    <style>
+        .multiselect-native-select{
+            width: 100%;
+        }
+        .select2-container{
+            width: 100%;
+            min-width: 100% !important;
+        }
+
+        .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
+            border-radius: 0!important;
+            display: flex;
+            align-items: center;
+
+            height: auto!important;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+
+        section.range-slider {
+            position: relative;
+            width: 100%;
+            height: 35px;
+            text-align: center;
+        }
+
+        section.range-slider input {
+            pointer-events: none;
+            position: absolute;
+            overflow: hidden;
+            left: 0;
+            top: 15px;
+            min-width: 100%;
+            width: 100%;
+            outline: none;
+            height: 18px;
+            margin: 0;
+            padding: 0;
+        }
+
+        section.range-slider input::-webkit-slider-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 1;
+            outline: 0;
+        }
+
+        section.range-slider input::-moz-range-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 10;
+            -moz-appearance: none;
+            width: 9px;
+        }
+        section.range-slider input::-moz-range-track {
+            position: relative;
+            z-index: -1;
+            background-color: rgba(0, 0, 0, 1);
+            border: 0;
+        }
+        section.range-slider input:last-of-type::-moz-range-track {
+            -moz-appearance: none;
+            background: none transparent;
+            border: 0;
+        }
+        section.range-slider input[type=range]::-moz-focus-outer {
+            border: 0;
+        }
+    </style>
+    <script src="{% static 'assets/js/plugins/forms/selects/bootstrap_multiselect.js' %}"></script>
+{% endblock %}
+
+
+{% block page-header %}
+    <a href="{{ check.get_absolute_url }}">{{ check.title }}</a> / Назначить исполнителя
+{% endblock %}
+
+
+{% block content %}
+
+
+    <!-- DIRECT PERFORMER APPOINT VIEW -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="font-weight-bold text-black-50">Назначить исполнителя самостоятельно</h4>
+        </div>
+        <div class="card-body">
+             <div class="">
+                 <form action="" method="post">
+                     {% csrf_token %}
+                     <div class="container-fluid">
+                         <div class="row">
+                             <div class="overflow-hidden col-10">{{ form.performer }}</div>
+                             <div class="overflow-hidden col-2 p-1 d-flex justify-content-end">
+                                <input type="submit" class="btn btn-primary" value="Назначить">
+                             </div>
+                         </div>
+                     </div>
+                 </form>
+             </div>
+        </div>
+    </div><!-- /DIRECT PERFORMER APPOINT VIEW -->
+
+
+    <!-- APPLY PERFORM REQUEST -->
+    {% if check.perform_requests.exists %}
+        <div class="card">
+            <div class="card-header">
+                <h4 class="font-weight-bold text-black-50">Назначить исполнителя из списка заявок на исполнение</h4>
+            </div>
+            <div class="card-body">
+                <div class="">
+                    <div>
+                        {% for perform_request in check.perform_requests.all %}
+                            <div class="perform_request row">
+                                <div class="col m-2">
+                                    <a href="{{ perform_request.performer.get_absolute_url }}">
+                                        {{ perform_request.performer.get_full_name }}
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <form action="{% url 'check:approve-perform-request' perform_request.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="submit" class="btn btn-primary" value="Одобрить">
+                                    </form>
+                                </div>
+                            </div>
+                        {% empty %}
+                            Для данной проверки нет запросов на исполнение
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div><!-- APPLY PERFORM REQUEST -->
+
+    {% endif %}
+
+
+    <!-- SEND PERFORM INVITATIONS -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="font-weight-bold text-black-50">Выслать приглашение на проведение проверки</h4>
+        </div>
+
+        <form action="" method="get">
+            <div class="row">
+                <div class="col-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-2 mt-2">
+                                <label class="text-black-50 font-weight-bold" for="{{ filter.form.is_approved.id_for_label }}">Был одобрен:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.is_approved }}</div>
+                            </div>
+                            <div class="mb-2 mt-2">
+                                <label class="text-black-50 font-weight-bold">Возраст:</label>
+                                <div class="d-flex align-items-center">
+                                    <section class="range-slider">
+                                        <span class="rangeValues"></span>
+                                        {{ filter.form.age_gt }}
+                                        {{ filter.form.age_lt }}
+                                    </section>
+                                </div>
+                            </div>
+                            <div class="mb-2 mt-2">
+                                <label class="text-black-50 font-weight-bold" for="{{ filter.form.age_gt.id_for_label }}">Возраст авто:</label>
+                                <div class="d-flex align-items-center">
+                                    <section class="range-slider">
+                                        <span>Возраст авто: </span>
+                                        <span class="rangeValues"></span>
+                                        {{ filter.form.vehicle_age_gt }}
+                                        {{ filter.form.vehicle_age_lt }}
+                                    </section>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="mb-2 mt-2">
+                                <label class="text-black-50 font-weight-bold" for="{{ filter.form.education.id_for_label }}">Образование:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.education }}</div>
+                            </div>
+                            <div class="mb-2 mt-2">
+                                <label class="text-black-50 font-weight-bold" for="{{ filter.form.live_city.id_for_label }}">Город проживания:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.live_city }}</div>
+                            </div>
+                            <div class="mb-2 mt-2">
+                                <label class="text-black-50 font-weight-bold" for="{{ filter.form.work_city.id_for_label }}">Города проверок:</label>
+                                <div class="d-flex align-items-center">{{ filter.form.work_city }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center m-2">
+                <input type="submit" value="Фильтровать" class="btn btn-dark m-1">
+                <a href="{% url 'check:appoint-performer' check.id %}" class="btn bg-grey-300 m-1">Очистить</a>
+            </div>
+
+        </form>
+
+        <div class="card-body">
+            <form action="" method="post">
+                {% csrf_token %}
+
+                {{ invite_form.check }}
+                <select name="invite-performers" required="" id="id_invite-performers" multiple=""
+                        id="performer-select" class="row w-100" style="height: 40vh">
+                    {% for performer in invite_form.performers.field.queryset %}
+                        <option value="{{ performer.id }}" class="sm-12">
+                            Имя: {{ performer.get_full_name }},
+                            Возраст:{{ performer.profile.age }} лет,
+                            Транспорт: {{ performer.profile.autos_list }},
+                            Город: {{ performer.profile.city }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                {% if invite_form.performer.errors %}
+                    <span class="text-danger-400">{{ invite_form.performers.errors.as_text }}</span>
+                {% endif %}
+                <div class="d-flex justify-content-center mt-3">
+                    <input type="submit" value="Выслать" class="btn btn-primary">
+                </div>
+
+            </form>
+        </div>
+    </div><!-- SEND PERFORM INVITATIONS -->
+
+{% endblock %}
+
+{% block script %}
+    {{ form.media }}
+    <script>
+    $('.multiselect').multiselect({nonSelectedText: 'Выбрать'});
+    function getVals(){
+        // Get slider values
+        let parent = this.parentNode;
+        let slides = parent.getElementsByTagName("input");
+        let slide1 = parseFloat( slides[0].value );
+        let slide2 = parseFloat( slides[1].value );
+        // Neither slider will clip the other, so make sure we determine which is larger
+        if( slide1 > slide2 ){ let tmp = slide2; slide2 = slide1; slide1 = tmp; }
+
+            let displayElement = parent.getElementsByClassName("rangeValues")[0];
+            displayElement.innerHTML = slide1 + " - " + slide2;
+        }
+
+    window.onload = function(){
+        // Initialize Sliders
+        let sliderSections = document.getElementsByClassName("range-slider");
+        for( let x = 0; x < sliderSections.length; x++ ){
+            let sliders = sliderSections[x].getElementsByTagName("input");
+            for( let y = 0; y < sliders.length; y++ ){
+                if( sliders[y].type ==="range" ){
+                    sliders[y].oninput = getVals;
+                    // Manually trigger event first time to display values
+                    sliders[y].oninput();
+                }
+            }
+        }
+    }
+    </script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block header-buttons %}
+    <input type="submit" form="instruction-form" value="Сохранить" class="btn btn-primary">
+{% endblock %}
+
+
+{% block content %}
+
+    <form method="post" id="instruction-form">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <span class="text-danger-400">{{ form.name.errors.as_text }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                {{ form.body }}
+            </div>
+        </div>
+
+    </form>
+
+
+
+{% endblock %}

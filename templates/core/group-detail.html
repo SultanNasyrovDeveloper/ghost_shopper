@@ -1,0 +1,48 @@
+{% extends 'base/base_app.html' %}
+
+{% block page-header %}
+    <a href="{% url 'core:group-list' %}">Группы</a> / Группа {{ group.name }}
+{% endblock %}
+
+{% block header-buttons %}
+    <a href="{% url 'core:group-update' group.id %}" class="btn btn-info ml-1">Редактировать</a>
+    <a href="{% url 'core:group-delete' group.id %}" class="btn btn-danger ml-1">Удалить</a>
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ group.name }}</h2>
+        </div>
+        <div class="card-body">
+            <div>
+                Разрешения:
+            </div>
+            <div>
+                {% for permission in group.permissions.all %}
+                    <div class="permission">
+                        {{ permission.name }}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card group-users">
+        <div class="card-header">
+            Пользователи
+        </div>
+
+        <div class="card-body">
+            {% for user in group.user_set.all %}
+                <div class="user">
+                    <div class="col">{{ user.get_full_name }}</div>
+                    <div class="col"><a href=""><i class="icon-trash text-danger-400"></i></a></div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+{% endblock %}

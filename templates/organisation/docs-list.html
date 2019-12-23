@@ -1,0 +1,60 @@
+{% extends 'base/base_app.html' %}
+
+{% block header-buttons %}
+    <a class="btn btn-primary" href="{% url 'organisation:generate' organisation.id %}">Создать текущие</a>
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- PAGE HEADER -->
+    <div class="card">
+        <div class="card-header">
+            <h4 class="text-black-50 font-weight-bold">Документы организации</h4>
+        </div>
+    </div><!-- /PAGE HEADER -->
+
+
+    <!-- DOCS LIST -->
+    <div class="card">
+
+        <div class="card-body d-flex flex-column justify-content-between">
+            <div class="results">
+                {% for document in docs %}
+                    <a href="{{ document.get_absolute_url }}" class="d-flex row bg-light m-1 p-2 check" style="border-radius: 3px">
+                        <div class="text-black-50">{{ document.id }}</div>
+                        <div class="text-black-50 font-weight-bold pl-2">{{ document }}</div>
+                    </a>
+
+                {% empty %}
+                    <h5 class="text-black-50 font-weight-bold">У данной организации пока нет отчетных документов</h5>
+
+                {% endfor %}
+
+            </div>
+        </div>
+
+        {% if is_paginated %}
+            <div class="d-flex justify-content-center mt-3 mb-3">
+
+                <ul class="pagination shadow-1">
+
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a href="?page=1" class="page-link page-link-white legitRipple"><<</a></li>
+                        <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link page-link-white legitRipple"><</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a href="#" class="page-link page-link-white legitRipple">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</a></li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link page-link-white legitRipple">></a></li>
+                        <li class="page-item"><a href="?page={{ page_obj.paginator.num_pages }}" class="page-link page-link-white legitRipple">>></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+        {% endif %}
+
+
+    </div><!-- /DOCS LIST -->
+
+{% endblock %}

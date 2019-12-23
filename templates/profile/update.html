@@ -1,0 +1,185 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block meta %}
+    <title>Редактировать профиль</title>
+{% endblock %}
+
+{% block css %}
+    <script src="{% static 'assets/js/plugins/forms/inputs/formatter.min.js' %}"></script>
+{% endblock %}
+
+{% block page-header %}
+    <a href="">Профиль</a> / Редактировать
+{% endblock %}
+
+{% block header-buttons %}
+    <input type="submit" form="update-form" class="btn btn-primary" value="Сохранить">
+{% endblock %}
+
+
+{% block content %}
+
+
+    <!-- FORM CONTAINER -->
+    <div class="card">
+        <div class="card-body">
+
+            <!-- FORM -->
+            <form id="update-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="non-field-errors"> <!-- non field errors -->
+                    {% if user_form.non_field_errors %}
+                        <span class="text-danger-400">{{ user_form.non_field_errors.as_text }}</span>
+                    {% endif %}
+                    {% if profile_form.non_field_errors %}
+                        <span class="text-danger-400">{{ profile_form.non_field_errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- non field errors -->
+
+                <div class="form-group row"><!-- avatar -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Изображение: </label>
+                    <div class="col-lg-9">{{ user_form.avatar }}</div>
+                    {% if user_form.avatar.errors %}
+                        <span class="text-danger-400">{{ user_form.avatar.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /avatar -->
+
+                <div class="form-group row"><!-- last name -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Фамилия: </label>
+                    <div class="col-lg-9">{{ user_form.last_name }}</div>
+                    {% if user_form.last_name.errors %}
+                        <span class="text-danger-400">{{ user_form.last_name.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /last name -->
+
+                <div class="form-group row"><!-- first name -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Имя: </label>
+                    <div class="col-lg-9">{{ user_form.first_name }}</div>
+                    {% if user_form.first_name.errors %}
+                        <span class="text-danger-400">{{ user_form.first_name.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /first name -->
+
+                <div class="form-group row"><!-- patronymic -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Отчество: </label>
+                    <div class="col-lg-9">{{ user_form.patronymic }}</div>
+                    {% if user_form.patronymic.errors %}
+                        <span class="text-danger-400">{{ user_form.patronymic.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /patronymic -->
+
+                {% if user_form.email %}
+                    <div class="form-group row"><!-- email -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Email: </label>
+                        <div class="col-lg-9">{{ user_form.email }}</div>
+                        {% if user_form.email.errors %}
+                            <span class="text-danger-400">{{ user_form.email.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /email -->
+                {% endif %}
+
+                <div class="form-group row"><!-- phone number -->
+                    <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Контактный номер: </label>
+                    <div class="col-lg-9">{{ user_form.phone_number }}</div>
+                    {% if user_form.phone_number.errors %}
+                        <span class="text-danger-400">{{ user_form.phone_number.errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- /phone number -->
+
+                {% if user_obj.is_performer %}
+                    <div class="form-group row"><!-- birth date -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Дата рождения: </label>
+                        <div class="col-lg-9">{{ profile_form.birth_date }}</div>
+                        {% if profile_form.birth_date.errors %}
+                            <span class="text-danger-400">{{ profile_form.birth_date.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /birth date -->
+
+                    <div class="form-group row"><!-- education -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Образование: </label>
+                        <div class="col-lg-9">{{ profile_form.education }}</div>
+                        {% if profile_form.education.errors %}
+                            <span class="text-danger-400">{{ profile_form.education.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /education -->
+
+                    <div class="form-group row"><!-- city -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Город: </label>
+                        <div class="col-lg-9">{{ profile_form.city }}</div>
+                        {% if profile_form.city.errors %}
+                            <span class="text-danger-400">{{ profile_form.city.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /city -->
+
+                    <div class="form-group row"><!-- work cities -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Города проведения проверок: </label>
+                        <div class="col-lg-9">{{ profile_form.work_cities }}</div>
+                        {% if profile_form.work_cities.errors %}
+                            <span class="text-danger-400">{{ profile_form.work_cities.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /work cities -->
+
+                    <div class="form-group row"><!-- work place -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Место работы: </label>
+                        <div class="col-lg-9">{{ profile_form.work_place }}</div>
+                        {% if profile_form.work_place.errors %}
+                            <span class="text-danger-400">{{ profile_form.work_place.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /work place -->
+
+                    <div class="form-group row"><!-- position -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Должность: </label>
+                        <div class="col-lg-9">{{ profile_form.position }}</div>
+                        {% if profile_form.position.errors %}
+                            <span class="text-danger-400">{{ profile_form.position.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /position -->
+
+                    <div class="form-group row"><!-- additional -->
+                        <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Доп. информация: </label>
+                        <div class="col-lg-9">{{ profile_form.additional }}</div>
+                        {% if profile_form.additional.errors %}
+                            <span class="text-danger-400">{{ profile_form.additional.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /additional -->
+
+                    {% if user.is_staff %}
+                        <div class="form-group row"><!-- staff comment -->
+                            <label class="col-form-label col-lg-3 text-black-50 font-weight-bold">Комментарии персонала: </label>
+                            <div class="col-lg-9">{{ profile_form.staff_comment }}</div>
+                            {% if profile_form.staff_comment.errors %}
+                                <span class="text-danger-400">{{ profile_form.staff_comment.errors.as_text }}</span>
+                            {% endif %}
+                        </div><!-- /staff comment -->
+
+                    {% endif %}
+                
+                {% endif %}
+
+            </form><!-- FORM -->
+        </div>
+
+    </div><!-- /FORM CONTAINER -->
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/profile/update.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.date.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/js/plugins/pickers/pickadate/picker.time.js' %}"></script>
+    <script>
+        let options = {
+            monthsFull: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            weekdaysFull: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+            weekdaysShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            selectMonths: true,
+            selectYears: 120,
+            format: 'yyyy-mm-dd'
+        };
+        $('.pickadate').pickadate(options);
+    </script>
+{% endblock %}

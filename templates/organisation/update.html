@@ -1,0 +1,52 @@
+{% extends 'base/base_app.html' %}
+
+{% block meta %}
+    <title>Редактировать узелл организации</title>
+{% endblock %}
+
+{% block page-header %}
+    Редактировать узел организации
+{% endblock %}
+
+
+{% block header-buttons %}
+    <input type="submit" form="organisation-name" class="btn btn-primary m-2" value="Сохранить">
+{% endblock %}
+
+{% block content %}
+
+    <!-- PAGE HEADER -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-black-50 font-weight-bold">Редактировать узел организации</h3>
+        </div>
+    </div><!-- /PAGE HEADER -->
+
+
+    <!-- FORM -->
+    <div class="card">
+        <div class="card-body">
+            <form method="post" id="organisation-name">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <span class="danger">{{ form.non_field_errors.as_text }}</span>
+                {% endif %}
+
+                {% for field in form.visible_fields %}
+                    <div class="form-group row">
+                        <label class="col-12 col-lg-3 text-black-50 font-weight-bold" for="{{ form.status.id_for_label }}">
+                            {{ field.label }} :
+                        </label>
+                        <div class="col-12 col-lg-9 d-flex row">
+                            {{ field }}
+                        </div>
+                        {% if field.errors %}
+                            <span class="text-danger-400">{{ field.errors.as_text }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+    </div><!-- /FORM -->
+
+{% endblock %}

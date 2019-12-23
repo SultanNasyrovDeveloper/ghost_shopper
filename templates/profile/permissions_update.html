@@ -1,0 +1,22 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block header-buttons %}
+    <input type="submit" value="Сохранить" form="permissions-form" class="btn btn-info">
+
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+
+        </div>
+
+        <div class="card-body">
+            <form method="post" id="permissions-form">
+                {% csrf_token %}
+                {{ form }}
+            </form>
+        </div>
+    </div>
+{% endblock %}

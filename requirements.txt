@@ -1,0 +1,53 @@
+atomicwrites==1.3.0
+attrs==19.1.0
+confusable-homoglyphs==3.2.0
+coverage==4.5.4
+Django==2.2.3
+django-autocomplete-light==3.4.1
+django-cleanup==4.0.0
+django-clone==0.0.2
+django-cloneable==0.1.0
+django-debug-toolbar==2.0
+django-extensions==2.2.1
+django-filter==2.2.0
+-e git+https://github.com/coleifer/django-generic-m2m.git@83b90cd38275b04413f944fe37e4446e4fe09bf6#egg=django_generic_m2m
+django-gm2m==0.6.1
+django-js-asset==1.2.2
+django-mptt==0.10.0
+django-multiupload==0.5.2
+# Editable install with no version control (django-nested-admin==3.2.3)
+-e /home/nasirovsultan/Venvs/ghost_shopper/lib/python3.6/site-packages
+django-ordered-model==3.3.0
+django-querysetsequence==0.11
+django-summernote==0.8.11.4
+django-tagging==0.4.6
+django-taggit==1.1.0
+django-verified-email-field==1.5.1
+djangorestframework==3.10.1
+future==0.17.1
+importlib-metadata==0.19pip install
+mock==3.0.5
+more-itertools==7.2.0
+packaging==19.1
+Pillow==6.1.0
+pluggy==0.12.0
+psycopg2-binary==2.8.3
+py==1.8.0
+pyparsing==2.4.2
+pytest==5.0.1
+pytest-cov==2.7.1
+pytest-django==3.5.1
+pytest-splinter==2.0.1
+python-dateutil==2.8.0
+python-monkey-business==1.0.0
+pytz==2019.1
+selenium==3.141.0
+six==1.12.0
+splinter==0.11.0
+sqlparse==0.3.0
+tenacity==5.0.4
+timestring==1.6.4
+urllib3==1.25.3
+wcwidth==0.1.7
+whitenoise==4.1.3
+zipp==0.5.2

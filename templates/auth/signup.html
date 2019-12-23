@@ -1,0 +1,96 @@
+{% extends 'base/base.html' %}
+{%  load staticfiles %}
+
+{% block meta %}
+    <title>Регистрация нового пользователя</title>
+{% endblock %}
+
+
+{% block logo %}
+    <a href="{% url 'index_page:index' %}" class="d-inline-block">
+        {% if index_page.logo %}
+            <img src="{{ index_page.logo.url }}" alt="">
+        {% endif %}
+    </a>
+{% endblock %}
+
+
+{% block css %}
+    {{ form.media.js }}
+{% endblock %}
+
+
+{% block content %}
+    <div class="content d-flex justify-content-center align-items-center">
+
+        <!-- REGISTRATION FORM -->
+        <form class="login-form" method="post">
+            {% csrf_token %}
+
+            <div class="card mb-0">
+
+                <div class="card-body">
+
+                    <!-- FORM HEADER -->
+                    <div class="text-center mb-3">
+                        <i class="icon-user-plus icon-2x text-slate-300 border-slate-300 border-3 rounded-round p-3 mb-3 mt-1"></i>
+                        <h5 class="mb-0">Создать аккаунт</h5>
+                        {% if form.non_field_errors %}
+                            <span class="text-danger-400">{{ form.non_field_errors.as_text }}</span>
+                        {% else %}
+                            <span class="d-block text-muted">Все поля обязательны для заполнения</span>
+                        {% endif %}
+                    </div><!-- /FORM HEADER -->
+
+                    {{ form.is_performer }}
+
+                    <!-- USERNAME -->
+                    <div class="form-group form-group-feedback form-group-feedback-left">
+                        {{ form.username }}
+                        <div class="form-control-feedback">
+                            <i class="icon-user-check text-muted"></i>
+                        </div>
+                        {% if form.username.errors %}
+                            <span class="form-text text-danger"><i class="icon-cancel-circle2 mr-2"></i> {{ form.username.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /USERNAME -->
+
+                    <!-- EMAIL-->
+                    <div class="form-group form-group-feedback form-group-feedback-left">
+                        {{ form.email }}
+                        <div class="form-control-feedback">
+                            <i class="icon-mention text-muted"></i>
+                        </div>
+                        {% if form.email.errors %}
+                            <span class="form-text text-danger"><i class="icon-cancel-circle2 mr-2"></i> {{ form.email.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /EMAIL-->
+
+                    <!-- PASSWORD 1 -->
+                    <div class="form-group form-group-feedback form-group-feedback-left">
+                        {{ form.password1 }}
+                        <div class="form-control-feedback">
+                            <i class="icon-user-lock text-muted"></i>
+                        </div>
+                        {% if form.password1.errors %}
+                            <span class="form-text text-danger"><i class="icon-cancel-circle2 mr-2"></i> {{ form.password1.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /PASSWORD 1 -->
+
+                    <!-- PASSWORD 2 -->
+                    <div class="form-group form-group-feedback form-group-feedback-left">
+                        {{ form.password2 }}
+                        <div class="form-control-feedback">
+                            <i class="icon-user-lock text-muted"></i>
+                        </div>
+                        {% if form.password2.errors %}
+                            <span class="form-text text-danger"><i class="icon-cancel-circle2 mr-2"></i> {{ form.password2.errors.as_text }}</span>
+                        {% endif %}
+                    </div><!-- /PASSWORD 2 -->
+
+                    <button type="submit" class="btn bg-primary btn-block legitRipple">Зарегистрироваться <i class="icon-circle-right2 ml-2"></i></button>
+                </div>
+            </div>
+        </form><!-- /REGISTRATION FORM -->
+    </div>
+{% endblock %}

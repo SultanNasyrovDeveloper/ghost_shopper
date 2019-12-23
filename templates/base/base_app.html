@@ -1,0 +1,237 @@
+{% extends 'base/base.html' %}
+
+{% block logo %}
+
+    <a href="{% url 'profile:detail' user.id %}" class="d-inline-block">
+        {% if index_page.logo %}
+            <img src="{{ index_page.logo.url }}" alt="">
+        {% endif %}
+    </a>
+{% endblock %}
+
+
+{% block navbar %}
+
+    <!-- TOGGLE BUTTON -->
+    <div class="d-md-none">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
+            <i class="icon-tree5"></i>
+        </button>
+        <button class="navbar-toggler sidebar-mobile-main-toggle" type="button">
+            <i class="icon-paragraph-justify3"></i>
+        </button>
+    </div><!-- /TOGGLE BUTTON -->
+
+
+    <!-- NAVBAR MENU -->
+    <div class="collapse navbar-collapse" id="navbar-mobile">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a href="#" class="navbar-nav-link sidebar-control sidebar-main-toggle d-none d-md-block">
+                    <i class="icon-paragraph-justify3"></i>
+                </a>
+            </li>
+        </ul>
+        <span class="badge bg-light shadow-1 text-indigo-700 ml-md-auto mr-md-3">{{ request.user.status }}</span>
+
+
+        <!-- NEWS WIDGET -->
+        <ul class="navbar-nav">
+            {% if not user.is_performer %}
+
+            <li class="nav-item dropdown">
+                <a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">
+                    <i class="icon-bell2"></i>
+                    <span class="d-md-none ml-2">Новости</span>
+                    <span class="badge badge-pill badge-mark border-orange-400 ml-auto ml-md-0"></span>
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-right dropdown-content wmin-md-350">
+                    <div class="dropdown-content-header">
+                        <h4 class="font-weight-semibold text-black-50">Новости</h4>
+                    </div>
+                    <div class="dropdown-content-body dropdown-scrollable">
+                        <ul class="media-list">
+                            {% for news in user.news_feed.news.all|slice:":15" %}
+                                <li class="media">
+                                    <div class="media-body text-black-50">
+                                        {{ news.body|safe }}
+                                        <div class="font-size-sm text-muted mt-1">{{ news.created|date:'Y-m-d H:i' }}</div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="dropdown-content-footer bg-light">
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+
+            <li class="nav-item">
+                <a href="{% url 'auth:logout' %}" class="navbar-nav-link" help="Выйти"><i class="icon-switch2"></i></a>
+            </li>
+        </ul><!-- NEWS WIDGET -->
+
+
+    </div><!-- /NAVBAR MENU -->
+
+{% endblock %}
+
+
+{% block sidebar %}
+    <!-- Main sidebar -->
+    <div class="sidebar sidebar-light sidebar-main sidebar-expand-md align-self-start">
+        <!-- Sidebar mobile toggler -->
+        <div class="sidebar-mobile-toggler text-center">
+            <a href="#" class="sidebar-mobile-main-toggle">
+                <i class="icon-arrow-left8"></i>
+            </a>
+            <span class="font-weight-semibold">Main sidebar</span>
+            <a href="#" class="sidebar-mobile-expand">
+                <i class="icon-screen-full"></i>
+                <i class="icon-screen-normal"></i>
+            </a>
+        </div>
+        <!-- /sidebar mobile toggler -->
+
+        <!-- Sidebar content -->
+        <div class="sidebar-content">
+            <!-- Navigation -->
+            <div class="card card-sidebar-mobile">
+                <div class="card-body p-0">
+                    <ul class="nav nav-sidebar" data-nav-type="accordion">
+
+                        <!-- CUSTOMER LINKS -->
+                        {% if user.is_customer %}
+                            <li class="nav-item">
+                                <a href="{{ user.get_absolute_url }}" class="nav-link text-black-50">
+                                    <i class="icon-home2"></i><span>Профиль</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organisation:detail' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
+                                    <i class="icon-tree6"></i><span>Организация</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organisation:current-checks' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
+                                    <i class="icon-spinner10"></i><span>Текущие проверки</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organisation:checks' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
+                                    <i class="icon-finish"></i><span>Завершенные проверки</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organisation:checks' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
+                                    <i class="icon-stack2"></i><span>Документы</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organisation:detail' user.profile.organisation_tree_node.id %}" class="nav-link text-black-50">
+                                    <i class="icon-address-book2"></i><span>Контакты</span></a>
+                            </li>
+                            <!-- /CUSTOMER LINKS -->
+
+                        <!-- PERFORMER LINKS -->
+                        {% elif user.is_performer %}
+                            <li class="nav-item">
+                                <a href="{{ user.get_absolute_url }}" class="nav-link text-black-50">
+                                    <i class="icon-home2"></i><span>Профиль</span>
+                                </a>
+                            </li>
+                            {% if user.performer_profile.is_approved %}
+                                <li class="nav-item">
+                                    <a href="{% url 'check:available' %}" class="nav-link text-black-50">
+                                        <i class="icon-copy"></i><span>Доступные проверки</span>
+                                        {% if available_checks_number != 0 %}
+                                            <span class="badge bg-blue-400 align-self-center ml-auto">{{ available_checks_number }}</span>
+                                        {% endif %}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'check:performer-current' user.id %}" class="nav-link text-black-50"><i class="icon-spinner10"></i><span>Текущие проверки</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'check:performer-closed' user.id %}" class="nav-link text-black-50"><i class="icon-finish"></i><span>Завершенные проверки</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'check:list' %}" class="nav-link text-black-50"><i class="icon-address-book2"></i><span>Контакты</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{% url 'check:list' %}" class="nav-link text-black-50"><i class="icon-file-check"></i><span>Правила пользования</span></a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item"><a class="nav-link disabled">Функции будут доступны после одобрения профиля</a></li>
+
+                            {% endif %}
+
+
+                        <!-- STAFF LINKS -->
+                        {% elif user.is_staff %}
+                            <li class="nav-item">
+                                <a href="{{ user.get_absolute_url }}" class="nav-link text-black-50">
+                                    <i class="icon-home2"></i><span>Профиль</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'organisation:list' %}" class="nav-link text-black-50"><i class="icon-tree6"></i><span>Организации</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'project:list' %}" class="nav-link text-black-50"><i class="icon-files-empty2"></i><span>Проект</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'check:list' %}" class="nav-link text-black-50"><i class="icon-file-text2"></i><span>Проверки</span></a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{% url 'instruction:list' %}" class="nav-link text-black-50"><i class="icon-puzzle3"></i><span>Инструкции</span></a>
+                            </li>
+                            
+                            <li class="nav-item nav-item-submenu">
+                                <a href="{% url 'profile:list' %}" class="nav-link text-black-50"><i class="icon-users"></i><span>Пользователи</span></a>
+                                <ul class="nav nav-group-sub" data-submenu-title="Пользователи">
+                                    <li class="nav-item"><a href="{% url 'profile:list' %}" class="nav-link">Все</a></li>
+                                    <li class="nav-item"><a href="{% url 'profile:list' %}?is_staff=true" class="nav-link">Персонал</a></li>
+                                    <li class="nav-item"><a href="{% url 'profile:performers' %}" class="nav-link">Исполнители</a></li>
+                                    <li class="nav-item"><a href="{% url 'profile:list' %}?is_customer=true" class="nav-link">Заказчики</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'profile:approval-request-list' %}" class="nav-link text-black-50">
+                                    <i class="icon-plus-circle2"></i><span>Заявки на одобрение</span>
+                                    {% if approval_requests_number %}
+                                        <span class="badge bg-blue-400 align-self-center ml-auto">{{ approval_requests_number }}</span>
+                                    {% endif %}
+
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'index_page:update' %}" class="nav-link text-black-50"><i class="icon-cogs"></i><span>Главная страница</span></a>
+                            </li>
+                            <li class="nav-item nav-item-submenu">
+                                <a href="#" class="nav-link text-black-50"><i class="icon-wrench"></i> <span>Системные</span></a>
+                                <ul class="nav nav-group-sub" data-submenu-title="Layouts">
+                                    <li class="nav-item"><a href="{% url 'core:my-organisation' %}" class="nav-link">Моя организация</a></li>
+                                    <li class="nav-item"><a href="{% url 'core:check-kind-list' %}" class="nav-link">Типы проверок</a></li>
+                                    <li class="nav-item"><a href="{% url 'core:section_name_list' %}" class="nav-link">Секции чеклистов</a></li>
+                                    <li class="nav-item"><a href="{% url 'core:car-brand-list' %}" class="nav-link">Марки и модели авто</a></li>
+                                    <li class="nav-item"><a href="{% url 'core:city-list' %}" class="nav-link">Города</a></li>
+                                    <li class="nav-item"><a href="{% url 'core:performer-letters-template' %}" class="nav-link">Шаблоны</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <!-- /navigation -->
+
+        </div>
+        <!-- /sidebar content -->
+
+    </div>
+    <!-- /main sidebar -->
+{% endblock %}
+
+

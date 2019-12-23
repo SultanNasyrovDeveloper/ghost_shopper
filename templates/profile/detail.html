@@ -1,0 +1,338 @@
+{% extends 'base/base_app.html' %}
+{% load staticfiles %}
+
+
+{% block css %}
+    <style>
+        .select2-container{
+            width: 100%;
+            min-width: 100% !important;
+        }
+
+        .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
+            border-radius: 0!important;
+            display: flex;
+            align-items: center;
+
+            height: auto!important;
+        }
+
+        .select2-search--dropdown:after{
+            display: none;
+        }
+    </style>
+
+{% endblock %}
+
+
+{% block meta %}
+    <title>Профиль пользователя</title>
+
+{% endblock %}
+
+{% block page-header %}
+    Профиль пользователя
+{% endblock %}
+
+
+{% block header-buttons %}
+    {% if user_obj == user %}
+        <a href="{% url 'auth:change_password' %}" class="btn btn-primary m-1">Смена пароля</a>
+    {% endif %}
+
+    <!-- STAFF BUTTONS -->
+    {% if user.is_staff %}
+        <!-- PROFILE APPROVAL BUTTONS -->
+        {% if user_obj.is_performer %}
+            {% if user_obj.profile.approve_request %}
+                {% if user_obj.profile.approve_request.status == approval_request_statuses.ACTIVE %}
+                    <form action="{% url 'profile:approval-request-accept' user_obj.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary m-1" value="Одобрить">
+                    </form>
+                    <a class="btn btn-primary m-1 text-white cursor-pointer" data-toggle="modal" data-target="#decline-approve-request-modal">Отклонить</a>
+
+                {% elif user_obj.profile.approve_request.status == approval_request_statuses.DECLINED %}
+
+                    <form action="{% url 'profile:approval-request-accept' user_obj.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary m-1" value="Одобрить">
+                    </form>
+                {% endif %}
+            {% endif %}
+
+        {% endif %}<!-- PROFILE APPROVAL BUTTONS -->
+        <a class="btn btn-primary m-1" href="{% url 'profile:update' user_obj.id %}">Редактировать</a>
+        <a href="{% url 'profile:delete' user_obj.id %}" class="btn btn-danger m-1">Удалить</a>
+    <!-- /STAFF BUTTONS -->
+
+
+    <!-- PERFORMER BUTTONS -->
+    {% elif user.is_performer %}
+        {% if not user_obj.performer_profile.is_approved %}
+            {% if not user_obj.profile.approve_request %}
+                <a class="btn btn-primary m-1" href="{% url 'profile:update' user_obj.id %}">Редактировать</a>
+                <form action="{% url 'profile:approval_request' user.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary m-1" value="Отправить на одобрение">
+                </form>
+            {% elif user_obj.profile.approve_request and user_obj.profile.approve_request.status == approval_request_statuses.DECLINED %}
+                <a class="btn btn-primary m-1" href="{% url 'profile:update' user_obj.id %}">Редактировать</a>
+                <form action="{% url 'profile:approval_request' user.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary m-1" value="Отправить на одобрение">
+                </form>
+            {% endif %}
+        {% endif %}
+     <!-- /PERFORMER BUTTONS -->
+
+    <!-- CUSTOMER BUTTONS -->
+    {% elif user.is_customer %}
+        <a class="btn btn-primary m-1" href="{% url 'profile:update' user_obj.id %}">Редактировать</a>
+    <!-- /CUSTOMER BUTTONS -->
+
+    {% endif %}
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+    <!-- USER CARD -->
+    <div class="user-card card">
+
+        <!-- USER FULL NAME -->
+        <div class="card-header header-elements-inline">
+            <h2 class="text-black-50" style="font-weight: 900">{{ user_obj.get_full_name }}</h2>
+            {% if user_obj.is_performer %}
+                <div class="header-elements">
+                    {% if user_obj.profile.is_approved %}
+                        <span class="badge badge-success">Одобрен</span>
+                    {% else %}
+                        {% if user_obj.profile.approve_request %}
+                            {% if user_obj.profile.approve_request.status == approval_request_statuses.ACTIVE %}
+                                <span class="badge badge-info">Ожидает одобрения</span>
+                            {% elif user_obj.profile.approve_request.status == approval_request_statuses.DECLINED %}
+                                <span class="badge badge-warning">Требует доработки</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge badge-light">Заполняется</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+
+
+        </div><!-- /USER FULL NAME -->
+
+        <!-- CARD BODY -->
+        <div class="card-body">
+            <div class="row">
+
+                <!-- USER AVATAR -->
+                <div class="col-md-4" style="height: 70vh; overflow: hidden">
+                    {% if user_obj.avatar %}
+                        <img class="img-fluid" src="{{ user_obj.avatar.url }}" alt="{{ user_obj.get_full_name }}">
+                    {% else %}
+                        <div class="container-fluid" style="background-color: #dddddd; height: 100%"></div>
+                    {% endif %}
+                </div><!-- /USER AVATAR -->
+
+
+                <!-- USER INFO CONTAINER -->
+                <div class="col-md-8">
+                    <h3 class="text-black-50" style="font-weight: 900">Основная информация</h3>
+                    {% if user_obj.profile.approve_request and user_obj.profile.approve_request.was_declined %}
+                        <div>
+                            <span class="text-danger">{{ user_obj.profile.approve_request.notes }}</span>
+                        </div>
+                    {% endif %}
+                    <!-- MAIN INFO -->
+                    <ul style="list-style: none; padding: 0;">
+
+                        <li class="row"> <!-- last name -->
+                            <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Фамилия: </span>
+                            <span class="text-black-50 col-6 col-sm-9">{% if user_obj.last_name %}{{ user_obj.last_name }} {% else %}Не указана{% endif %}</span>
+                        </li><!-- /last name -->
+
+                        <li class="row"><!-- first name -->
+                            <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Имя: </span>
+                            <span class="text-black-50 col-6 col-sm-9">{% if user_obj.first_name %}{{ user_obj.first_name }} {% else %}Не указано{% endif %}</span>
+                        </li><!-- /first name -->
+
+                        <li class="row"><!-- patronymic -->
+                            <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Отчество: </span>
+                            <span class="text-black-50 col-6 col-sm-9">{% if user_obj.patronymic %}{{ user_obj.patronymic }} {% else %}Не указано{% endif %}</span>
+                        </li><!-- /patronymic -->
+
+                        <li class="row"><!-- email -->
+                            <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Email: </span>
+                            <span class="text-black-50 col-6 col-sm-9">{% if user_obj.email %}{{ user_obj.email }} {% else %}Не указан{% endif %}</span>
+                        </li><!-- /email -->
+
+                        <li class="row"><!-- phone number-->
+                            <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Контактный номер: </span>
+                            <span class="text-black-50 col-6 col-sm-9">{% if user_obj.phone_number %}{{ user_obj.phone_number }} {% else %}Не указан{% endif %}</span>
+                        </li><!-- /phone number-->
+
+                        {% if user_obj.is_performer %}
+
+                            <li class="row"><!-- birth date-->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Дата рождения: </span>
+                                <span class="text-black-50 col-6 col-sm-9">{{ user_obj.profile.birth_date }} ({{ user_obj.profile.age }} лет)</span>
+                            </li><!-- /birth date -->
+
+                            <li class="row"><!-- education -->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Образование: </span>
+                                <span class="text-black-50 col-6 col-sm-9">{{ user_obj.profile.get_education_display }}</span>
+                            </li><!-- /education -->
+
+                            <li class="row"><!-- city -->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Город: </span>
+                                <span class="text-black-50 col-6 col-sm-9">{{ user_obj.profile.city.name }}</span>
+                            </li><!-- /city -->
+
+                            <li class="row"><!-- check cities -->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Города проведения проверок:</span>
+                                <span class="text-black-50 col-6 col-sm-9">
+                                    {% for city in user_obj.profile.work_cities.all %}
+                                        {{ city.name }},
+                                    {% endfor %}
+                                </span>
+                            </li><!-- check cities -->
+
+                            <li class="row"><!-- work place -->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Место работы: </span>
+                                <span class="text-black-50 col-6 col-sm-9">{{ user_obj.profile.work_place }}</span>
+                            </li><!-- /work place -->
+
+                            <li class="row"><!-- work position -->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Должность: </span>
+                                <span class="text-black-50 col-6 col-sm-9">{{ user_obj.profile.position }}</span>
+                            </li><!-- /work position -->
+
+                            <li class="row"><!-- additional -->
+                                <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Доп. информация: </span>
+                                <span class="text-black-50 col-6 col-sm-9">{{ user_obj.profile.additional }}</span>
+                            </li><!-- /additional -->
+
+                            {% if user.is_staff %}
+                                <li class="row"><!-- staff comment -->
+                                    <span class="text-black-50 col-6 col-sm-3" style="font-weight: 900">Комментарии персонала: </span>
+                                    <span class="text-black-50 col-6 col-sm-9">{{ user_obj.staff_comment }}</span>
+                                </li><!-- /staff comment -->
+                            {% endif %}
+                        {% endif %}
+                    </ul><!-- /MAIN INFO -->
+
+
+                    <!-- PERFORMER VEHICLE INFO -->
+                    {% if user_obj.is_performer %}
+                        <h3 class="text-black-50" style="font-weight: 900">Транспорт: </h3>
+                        <div class="autos row">
+                            {% for auto in user_obj.profile.autos.all %}
+                                <div class="col-sm-12 auto d-flex m-1 p-1 auto">
+                                    <div class="col-6 col-md-2 d-flex align-items-center text-black-50  bg-light">{{ auto.brand.name }}</div>
+                                    <div class="col-6 col-md-2 d-flex align-items-center text-black-50 bg-light">{{ auto.model.name }}</div>
+                                    <div class="col-6 col-md-2 d-flex align-items-center text-black-50 bg-light">Год выпуска: {{ auto.built_year }}</div>
+                                    <div class="col-6 col-md-2 d-flex align-items-center text-black-50 bg-light">Владеет c: {{ auto.owns_from }}</div>
+                                    <div class="col-6 col-md-2  bg-light">
+                                        <form action="{% url 'profile:delete-auto' auto.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-icon bg-transparent text-danger">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        
+                        <a class="btn btn-light mt-2" data-toggle="modal" data-target="#performer-auto-form-modal">Добавить</a>
+                    {% endif %}<!-- /PERFORMER VEHICLE INFO -->
+
+                </div><!-- USER INFO CONTAINER -->
+            </div>
+        </div><!-- /CARD BODY -->
+    </div><!-- /USER CARD -->
+
+
+
+    <div id="performer-auto-form-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить автомобиль</h5>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-auto-form" action="" method="post">
+                        {% csrf_token %}
+                        {{ auto_form }}
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link legitRipple" data-dismiss="modal">Закрыть</button>
+                    <input type="submit" form="create-auto-form" class="btn btn-primary">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="decline-approve-request-modal" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Форма отказа в одобрении профиля</h5>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="decline-form" action="{% url 'profile:approval-request-decline' user_obj.id %}" method="post">
+                        {% csrf_token %}
+                        {{ decline_form }}
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link legitRipple" data-dismiss="modal">Закрыть</button>
+                    <input type="submit" form="decline-form" class="btn btn-primary" value="Отправить">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="approval-message" class="modal fade" tabindex="-1" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <h5>{{ validation_errors }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block script %}
+    {{ auto_form.media }}
+    {% if validation_errors %}
+        <script>
+            $(document).ready(function () {
+                $("#approval-message").modal({});
+            });
+
+        </script>
+    {% endif %}
+{% endblock %}

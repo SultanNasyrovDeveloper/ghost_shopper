@@ -1,0 +1,18 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-body d-flex justify-content-center">
+            Вы уверены что хотите удалить объект {{ object }}
+        </div>
+
+        <div class="card-footer d-flex justify-content-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="submit" value="Удалить" class="btn btn-danger">
+            </form>
+
+        </div>
+    </div>
+{% endblock %}
