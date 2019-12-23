@@ -9,11 +9,13 @@ from ghost_shopper.core.models import MyOrganisation
 
 class BaseDocument:
 
-    my_organisation = MyOrganisation.get()
-
     @property
     def file_name(self):
         return NotImplementedError
+
+    @property
+    def my_organisation(self):
+        return MyOrganisation.get()
 
     @property
     def path_to_file(self):
