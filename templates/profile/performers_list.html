@@ -2,6 +2,11 @@
 {% load staticfiles %}
 
 
+{% block meta %}
+    <title>{{ page_name }}</title>
+{% endblock %}
+
+
 {% block css %}
     <style>
         .multiselect-native-select{
@@ -84,7 +89,7 @@
 {% endblock %}
 
 {% block page-header %}
-    Список пользователей
+    {{ page_name }}
 {% endblock %}
 
 {% block header-buttons %}
@@ -201,6 +206,11 @@
 
             </div>
         </div>
+
+
+        {% if filter %}
+
+        {% endif %}
 
         <div class="d-flex justify-content-center mt-3 mb-3">
 

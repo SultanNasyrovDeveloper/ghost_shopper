@@ -10,8 +10,10 @@ from .models import User
 
 class UserSearch(filters.FilterSet):
 
-    id = filters.NumberFilter(label='', widget=ac.Select2(
-        url=reverse_lazy('profile:autocomplete'), attrs={'data-placeholder': 'Поиск'}))
+    id = filters.NumberFilter(
+        label='',
+        widget=ac.Select2(url=reverse_lazy('profile:autocomplete'), attrs={'data-placeholder': 'Поиск'})
+    )
 
     class Meta:
         model = User

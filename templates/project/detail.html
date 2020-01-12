@@ -1,5 +1,9 @@
 {% extends 'base/base_app.html' %}
 
+{% block meta %}
+    <title>{{ project.name }}</title>
+{% endblock %}
+
 
 {% block page-header %}
     Проект {{ project.name }}
@@ -42,6 +46,10 @@
                         <div class="header text-black-50 col-6 col-sm-9">{{ check_template.start_date }}</div>
                     </div>
                     <div class="start-date row m-1">
+                        <div class="header text-black-50 col-6 col-sm-3 font-weight-bold">Тип проверок:</div>
+                        <div class="header text-black-50 col-6 col-sm-9">{{ check_template.kind }}</div>
+                    </div>
+                    <div class="start-date row m-1">
                         <div class="header text-black-50 col-6 col-sm-3 font-weight-bold">Окончание:</div>
                         <div class="header text-black-50 col-6 col-sm-9">{{ check_template.deadline }}</div>
                     </div>
@@ -56,10 +64,6 @@
                     <div class="start-date row m-1">
                         <div class="header text-black-50 col-6 col-sm-3 font-weight-bold">Дней на аппеляция:</div>
                         <div class="header text-black-50 col-6 col-sm-9">{{ check_template.conformation_period }}</div>
-                    </div>
-                    <div class="start-date row m-1">
-                        <div class="header text-black-50 col-6 col-sm-3 font-weight-bold">Дней на повторную аппеляцию:</div>
-                        <div class="header text-black-50 col-6 col-sm-9">{{ check_template.reappeal_period }}</div>
                     </div>
                     <div class="start-date row m-1">
                         <div class="header text-black-50 col-6 col-sm-3 font-weight-bold">Комментарий к проверке:</div>

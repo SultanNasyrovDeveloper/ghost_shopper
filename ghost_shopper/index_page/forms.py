@@ -5,22 +5,44 @@ from . import models
 
 
 class IndexPageForm(forms.ModelForm):
-    title = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    keywords = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    description = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    logo = forms.FileField(required=False, label='Логотип')
+
+    title = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Тег title',
+    )
+    keywords = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Тег keywords',
+    )
+    description = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Тег description',
+    )
+    phone_number = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Номер телефона',
+    )
+    email = forms.EmailField(
+        required=False, widget=forms.EmailInput(attrs={'class': 'form-control'}), label='Электронная почта',
+    )
+    header_background = forms.FileField(required=False, label='Фоновое изображение')
+    header_tagline = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Заголовок',
+    )
+    header_subtagline = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Подзаголовок',
+    )
+    company_name = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Название компании',
+    )
+    about_text = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Текст о нас',
+    )
+
 
     class Meta:
         model = models.IndexPage
-        fields = ('__all__')
-        widgets = {
-            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'header_tagline': forms.TextInput(attrs={'class': 'form-control'}),
-            'header_subtagline': forms.TextInput(attrs={'class': 'form-control'}),
-            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'about_text': forms.TextInput(attrs={'class': 'form-control'}),
-
-        }
+        fields = (
+            'logo', 'title', 'keywords', 'description', 'phone_number', 'header_background', 'header_tagline',
+            'header_subtagline', 'phone_number', 'email', 'company_name', 'about_text',
+        )
 
 
 class CallbackForm(forms.ModelForm):

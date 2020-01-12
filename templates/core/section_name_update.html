@@ -1,0 +1,58 @@
+{% extends 'base/base_app.html' %}
+
+
+{% block meta %}
+    <title>Редактировать название секции</title>
+{% endblock %}
+
+
+{% block page-header %}
+    <a href="{% url 'core:section_name_list' %}">Список секций</a> /
+    {{ section_name.value }} /
+    Редактировать
+{% endblock %}
+
+{% block header-buttons %}
+    <input type="submit" form="check-kind-form" class="btn btn-primary" value="Сохранить">
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-black-50 font-weight-bold">
+                Редактировать секцию {{ section_name }}
+            </h3>
+        </div>
+
+        <div class="card-body">
+            <form action="" method="post" id="check-kind-form">
+                {% csrf_token %}
+
+                <div class="non-field-errors"> <!-- non field errors -->
+                    {% if user_form.non_field_errors %}
+                        <span class="text-danger-400">{{ form.non_field_errors.as_text }}</span>
+                    {% endif %}
+                </div><!-- non field errors -->
+
+                {% for field in form %}
+                    <div class="form-group row">
+                        <div class="mt-auto mb-auto col-12 col-lg-4">
+                            <span class="text-black-50 font-weight-bold">
+                                {{ field.label }} :
+                            </span>
+                        </div>
+
+                        <div class="col-12 col-lg-8 d-flex row">
+                            {{ field }}
+                        </div>
+                        {% if field.errors %}
+                            <span class="text-danger-400">{{ field.errors.as_text }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -28,9 +28,13 @@
 
 {% endblock %}
 
+{% block meta %}
+    <title>Список проектов</title>
+{% endblock %}
+
 
 {% block page-header %}
-    Проекты
+    Список проектов
 {% endblock %}
 
 {% block header-buttons %}
@@ -63,7 +67,8 @@
                     <a href="{{ project.get_absolute_url }}" class="project d-flex col justify-content-between bg-light m-1 p-2">
                         <div class="col font-weight-bold text-black-50">{{ project.name }}</div>
                     </a>
-
+                {% empty %}
+                    <span class="text-black-50 font-weight-bold">На данный момент в системе нет проектов</span>
                 {% endfor %}
 
             </div>

@@ -81,7 +81,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'ghost_shopper.user_profile.context_processors.approval_requests_number',
                 'ghost_shopper.check.context_processors.available_checks_number',
-                'ghost_shopper.index_page.context_processors.index_page'
+                'ghost_shopper.check.context_processors.current_checks_number',
+                'ghost_shopper.index_page.context_processors.index_page',
             ],
         },
     },

@@ -6,6 +6,12 @@
     <title>Статистика организации</title>
 {% endblock %}
 
+
+{% block page-header %}
+    <a href="{{ organisation.get_absolute_url }}">Организация</a> /
+    Статистика
+{% endblock %}
+
 {% block css %}
     <style>
         .multiselect-native-select{

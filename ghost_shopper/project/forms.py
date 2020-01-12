@@ -13,6 +13,7 @@ from .models import Project
 class ProjectForm(forms.ModelForm):
 
     targets = forms.ModelMultipleChoiceField(
+        label='Цели',
         queryset=OrganisationTreeNode.objects.exclude(level=0),
         widget=ac.ModelSelect2Multiple(url=reverse_lazy('organisation:autocomplete-node')))
 
@@ -33,12 +34,17 @@ class ProjectCheckTemplateForm(forms.ModelForm):
         fields = (
             'start_date', 'deadline', 'curator', 'reward', 'conformation_period', 'comment', 'instruction', 'kind')
         widgets = {
-            'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control pickadate'}),
+            'start_date': forms.DateInput(
+                attrs={'type': 'date', 'class': 'form-control pickadate'}
+            ),
             'deadline': forms.DateInput(attrs={'type': 'date', 'class': 'form-control pickadate'}),
             'reward': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Награда (руб)'}),
             'conformation_period': forms.NumberInput(attrs={'class': 'form-control'}),
             'comment': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Комментарий', 'rows': 3}),
-            'instruction': ac.Select2(url=reverse_lazy('instruction:autocomplete')),
+            'instruction': ac.Select2(
+                url=reverse_lazy('instruction:autocomplete'),
+                attrs={'data-placeholder': 'Выбрать инструкцию'}
+            ),
             'kind':  forms.Select(attrs={'class': 'form-control form-control-uniform', 'placeholder': 'Тип'})
         }
 

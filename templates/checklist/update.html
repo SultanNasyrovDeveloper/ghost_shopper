@@ -203,25 +203,27 @@
                             {% for question, answer_form in subsection.items %}
                                 <div class="question mb-1 row bg-light m-1 p-2 {% if checklist_is_valid is False and not answer_form.instance.question.is_answered %}border-1 border-danger{% endif %}">
                                     <div class="col-md-6 d-flex flex-column justify-content-center"> <!-- question -->
-                                    <span>{{ counter.increment }} - {{ question|safe }}</span>
-                                    {% if answer_form.non_field_errors %}
-                                        <span class="text-danger-400">{{ answer_form.non_field_errors.as_text }}</span>
-                                    {% endif %}
-                                </div><!-- /question -->
+                                        <div class="col d-flex text-black-50">
+                                            <div>{{ counter.increment }}<span> - </span></div> <div>{{ question|safe }}</div>
+                                        </div>
+                                        {% if answer_form.non_field_errors %}
+                                            <span class="text-danger-400">{{ answer_form.non_field_errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- /question -->
 
-                                <div class="col-md-3 answer-container d-flex flex-column justify-content-center"><!-- answer -->
-                                    {{ answer_form.answer }}
-                                    {% if answer_form.answer.errors %}
-                                        <span class="text-danger-400">{{ answer_form.answer.errors.as_text }}</span>
-                                    {% endif %}
-                                </div><!-- /answer -->
+                                    <div class="col-md-3 answer-container d-flex flex-column justify-content-center"><!-- answer -->
+                                        {{ answer_form.answer }}
+                                        {% if answer_form.answer.errors %}
+                                            <span class="text-danger-400">{{ answer_form.answer.errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- /answer -->
 
-                                <div class="col-md-3 d-flex flex-column justify-content-center"><!-- comment -->
-                                    {{ answer_form.performer_comment }}
-                                    {% if answer_form.performer_comment.errors %}
-                                        <span class="text-danger-400">{{ answer_form.performer_comment.errors.as_text }}</span>
-                                    {% endif %}
-                                </div><!-- /comment -->
+                                    <div class="col-md-3 d-flex flex-column justify-content-center"><!-- comment -->
+                                        {{ answer_form.performer_comment }}
+                                        {% if answer_form.performer_comment.errors %}
+                                            <span class="text-danger-400">{{ answer_form.performer_comment.errors.as_text }}</span>
+                                        {% endif %}
+                                    </div><!-- /comment -->
 
 
                                 {% if user.is_staff %}
@@ -268,7 +270,6 @@
                                     {% endif %}
                                 {% endif %}
 
-                        </div>
                             {% endfor %}
 
                         </div>
@@ -277,6 +278,7 @@
 
 
             </div><!-- SECTION FORM CARD -->
+            </div>
 
         {% endfor %}
     </form>

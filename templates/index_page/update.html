@@ -1,15 +1,29 @@
 {% extends 'base/base_app.html' %}
 {% load staticfiles %}
 
+{% block meta %}
+    <title>Настройки стартовой страницы</title>
+{% endblock %}
+
+{% block css %}
+    <script src="{% static 'assets/js/plugins/forms/inputs/formatter.min.js' %}"></script>
+{% endblock %}
+
+{% block page-header %}
+    Настройки стартовой страницы
+{% endblock %}
+
 
 {% block header-buttons %}
-    <input type="submit" form="index-page-form" class="btn btn-primary m-1">
+    <input type="submit" form="index-page-form" class="btn btn-primary m-1" value="Сохранить">
 {% endblock %}
 
 
 {% block content %}
     <div class="card">
-        <div class="card-header"><h3>Настройки главной страницы</h3></div>
+        <div class="card-header">
+            <h3 class="text-black-50 font-weight-bold">Настройки стартовой страницы</h3>
+        </div>
         <div class="card-body">
             <form action="" method="post" id="index-page-form" enctype="multipart/form-data">
                 {% csrf_token %}

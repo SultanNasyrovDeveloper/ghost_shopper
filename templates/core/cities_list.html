@@ -1,6 +1,16 @@
 {% extends 'base/base_app.html' %}
 
 
+{% block meta %}
+    <title>Список городов</title>
+{% endblock %}
+
+
+{% block page-header %}
+    Список городов
+{% endblock %}
+
+
 {% block header-buttons %}
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#city-form-modal">Создать</button>
 {% endblock %}
@@ -9,6 +19,10 @@
 {% block content %}
 
     <div class="card">
+
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">Список городов</h3>
+        </div>
 
         <div class="card-body d-flex flex-column justify-content-between">
             <div class="results">
@@ -19,14 +33,9 @@
                             <div class="col-10 font-weight-bold text-black-50">{{ city.name }}</div>
                             <div class="col-2"><a href="{% url 'core:city-delete' city.id %}"><i class="icon-trash text-danger-400"></i></a></div>
                         </div>
-                    {% endfor %}
-                </div>
-                <div class="col">
-                    {% for section_name in sections|slice:"21:41" %}
-                        <div class="d-flex col justify-content-between bg-light m-1 p-2">
-                            <div class="col-10 font-weight-bold text-black-50">{{ city.name }}</div>
-                            <div class="col-2"><a href="{% url 'core:city-delete' city.id %}"><i class="icon-trash text-danger-400"></i></a></div>
-                        </div>
+
+                    {% empty %}
+                        <span class="font-weight-bold text-black-50">Пока нет созданных городов</span>
                     {% endfor %}
                 </div>
             </div>

@@ -1,6 +1,10 @@
 {% extends 'base/base_app.html' %}
 {% load staticfiles %}
 
+{% block page-header %}
+    {{ organisation.title }}
+{% endblock %}
+
 
 {% block meta %}
     <title>{{ organisation.title }}</title>
@@ -8,15 +12,20 @@
 
 
 {% block header-buttons %}
-    <a href="{% url 'organisation:create-employee' organisation.id %}" class="btn btn-primary m-1">Создать сотрудника</a>
-    {% if organisation.level == 0 %}
-        <button data-target="#child-node-create-modal" data-toggle="modal" class="btn btn-primary m-1">Создать подразделение</button>
-    {% elif organisation.level == 1 %}
-        <button data-target="#child-node-create-modal" data-toggle="modal" class="btn btn-primary m-1">Создать отдел</button>
+
+    {% if user.is_staff %}
+        <a href="{% url 'organisation:create-employee' organisation.id %}" class="btn btn-primary m-1">Создать сотрудника</a>
+        {% if organisation.level == 0 %}
+            <button data-target="#child-node-create-modal" data-toggle="modal" class="btn btn-primary m-1">Создать подразделение</button>
+        {% elif organisation.level == 1 %}
+            <button data-target="#child-node-create-modal" data-toggle="modal" class="btn btn-primary m-1">Создать отдел</button>
+        {% endif %}
+
+        <a href="{% url 'organisation:update' organisation.id %}" class="btn btn-primary m-1">Редактировать</a>
+        <a href="{% url 'organisation:delete' organisation.id %}" class="btn btn-danger m-1">Удалить</a>
+
     {% endif %}
 
-    <a href="{% url 'organisation:update' organisation.id %}" class="btn btn-primary m-1">Редактировать</a>
-    <a href="{% url 'organisation:delete' organisation.id %}" class="btn btn-danger m-1">Удалить</a>
 {% endblock %}
 
 {% block css %}
@@ -281,7 +290,30 @@
                 <div class="modal-body">
                     <form action="" method="post" id="child-node-create-form">
                         {% csrf_token %}
-                        {{ form.as_p }}
+                        {% if form.non_field_errors %}
+                            <div class="row">
+                                <span class="text-danger">{{ form.non_field_errors.as_text }}</span>
+                            </div>
+                        {% endif %}
+                        {% for field in form.visible_fields %}
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <span class="text-black-50 font-weight-bold">{{ field.label }}: </span>
+                                </div>
+                                <div class="col-12">
+                                    {{ field }}
+                                </div>
+                                {% if field.errors %}
+                                    <div class="col-12">
+                                        <span class="text-danger">{{ field.errors.as_text }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        {% for field in form.hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+
                     </form>
 
                 </div>
@@ -299,6 +331,6 @@
 
 
 {% block script %}
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{% static 'plugins/axios/axios.js' %}"></script>
     <script src="{% static 'js/organisation/detail.js' %}"></script>
 {% endblock %}

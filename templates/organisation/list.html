@@ -65,7 +65,12 @@
         <div class="card-body d-flex flex-column justify-content-between">
             <div class="row">
                 {% for organisation in organisations %}
-                    <a class="organisation col-12 bg-light m-1 p-2 font-weight-bold text-black-50" href="{{ organisation.get_absolute_url }}">{{ organisation.name }}</a>
+                    <a class="organisation col-12 bg-light m-1 p-2 font-weight-bold text-black-50"
+                       href="{{ organisation.get_absolute_url }}">
+                        {{ organisation.name }}
+                    </a>
+                {% empty %}
+                    <span class="text-black-50">На данный момент нет созданных организаций</span>
                 {% endfor %}
             </div>
 
@@ -88,9 +93,6 @@
 
             {% endif %}
 
-
-
-            
         </div>
     </div>
 
@@ -107,6 +109,9 @@
                         {% csrf_token %}
                         {% for field in organisation_form %}
                             <div class="row mb-3">
+                                <div class="col-12">
+                                    <span class="font-weight-bold text-black-50">{{ field.label }}: </span>
+                                </div>
                                 <div class="col-12">
                                     {{ field }}
                                 </div>

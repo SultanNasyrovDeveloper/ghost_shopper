@@ -1,5 +1,9 @@
 {% extends 'base/base_app.html' %}
 
+{% block meta %}
+    <title>Список марок автомобилей</title>
+{% endblock %}
+
 {% block page-header %}
     Список марок автомобилей
 {% endblock %}
@@ -13,24 +17,22 @@
 {% block content %}
 
     <div class="card">
+        <div class="card-header">
+            <h3 class="text-black-50 font-weight-bold">Список марок автомобилей</h3>
+        </div>
 
         <div class="card-body d-flex flex-column justify-content-between">
             <div class="results">
 
                 <div class="col">
-                    {% for brand in car_brands|slice:":21" %}
+                    {% for brand in car_brands %}
                         <div class="d-flex col justify-content-between bg-light m-1 p-2">
                             <a class="col-10 text-black-50 font-weight-bold" href="{% url 'core:car-model-list' brand.id %}">{{ brand.name }}</a>
                             <div class="col-2"><a href="{% url 'core:car-brand-delete' brand.id %}" title="Удалить"><i class="icon-trash text-danger-400"></i></a></div>
                         </div>
-                    {% endfor %}
-                </div>
-                <div class="col">
-                    {% for brand in car_brands|slice:"21:41" %}
-                        <div class="d-flex col justify-content-between bg-light m-1 p-2">
-                            <div class="col-10 font-weight-bold text-black-50"><a href="{% url 'core:car-model-list' brand.id %}">{{ brand.name }}</a></div>
-                            <div class="col-2"><a href="{% url 'core:car-brand-delete' brand.id %}" title="Удалить"><i class="icon-trash text-danger-400"></i></a></div>
-                        </div>
+                        
+                    {% empty %}
+                        <span class="text-black-50 font-weight-bold">Нет созданных марок автомобилей</span>
                     {% endfor %}
                 </div>
             </div>

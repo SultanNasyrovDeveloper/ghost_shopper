@@ -1,6 +1,11 @@
 {% extends 'base/base_app.html' %}
 
 
+{% block meta %}
+    <title>{{ page_name }}</title>
+{% endblock %}
+
+
 {% block css %}
     <style>
         .user:hover{
@@ -38,7 +43,7 @@
 {% endblock %}
 
 {% block page-header %}
-    Список пользователей
+    {{ page_name }}
 {% endblock %}
 
 {% block header-buttons %}
@@ -49,6 +54,13 @@
 
 
 {% block content %}
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="font-weight-bold text-black-50">{{ page_name }}</h3>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body">
             <form action="" method="get" class="row">

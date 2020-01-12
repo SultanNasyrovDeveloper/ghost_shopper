@@ -38,8 +38,17 @@ class UserListView(LoginRequiredMixin, FilterView):
     filterset_class = filters.UserSearch
     paginate_by = 20
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        """
+        Add data to page context.
+        """
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['page_name'] = 'Список пользователей'
+        return context
+
 
 class PerformerListView(generic.TemplateView):
+
     template_name = 'profile/performers_list.html'
 
     def get_context_data(self, **kwargs):
@@ -52,6 +61,7 @@ class PerformerListView(generic.TemplateView):
         paginator = Paginator(filter.qs, 20)
         page = self.request.GET.get('page')
         context['users'] = paginator.get_page(page)
+        context['page_name'] = 'Список пользователей'
         return context
 
 
@@ -116,7 +126,7 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin,  generic.View):
             return user == profile_user
 
         elif user.is_customer:
-            return
+            return user == profile_user or profile_user in user.profile.organisation_tree_node.get_employees()
 
         elif user.is_staff:
             return True

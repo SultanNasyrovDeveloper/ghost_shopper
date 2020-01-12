@@ -26,7 +26,7 @@ class Checklist(models.Model):
 
     @property
     def name(self):
-        return 'Чеклист  {}'.format(self.id)
+        return 'Чек-лист {}'.format(self.check_obj.title)
 
     def clone(self, check):
 

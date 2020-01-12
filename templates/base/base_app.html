@@ -118,19 +118,14 @@
                             <li class="nav-item">
                                 <a href="{% url 'organisation:current-checks' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
                                     <i class="icon-spinner10"></i><span>Текущие проверки</span>
+                                    {% if current_checks_number != 0 %}
+                                        <span class="badge bg-green-400 align-self-center ml-auto">{{ current_checks_number }}</span>
+                                    {% endif %}
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{% url 'organisation:checks' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
                                     <i class="icon-finish"></i><span>Завершенные проверки</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'organisation:checks' user.profile.organisation_tree_node_id %}" class="nav-link text-black-50">
-                                    <i class="icon-stack2"></i><span>Документы</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{% url 'organisation:detail' user.profile.organisation_tree_node.id %}" class="nav-link text-black-50">
-                                    <i class="icon-address-book2"></i><span>Контакты</span></a>
                             </li>
                             <!-- /CUSTOMER LINKS -->
 
@@ -151,16 +146,15 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'check:performer-current' user.id %}" class="nav-link text-black-50"><i class="icon-spinner10"></i><span>Текущие проверки</span></a>
+                                    <a href="{% url 'check:performer-current' user.id %}" class="nav-link text-black-50">
+                                        <i class="icon-spinner10"></i><span>Текущие проверки</span>
+                                        {% if current_checks_number != 0 %}
+                                            <span class="badge bg-green-400 align-self-center ml-auto">{{ current_checks_number }}</span>
+                                        {% endif %}
+                                    </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{% url 'check:performer-closed' user.id %}" class="nav-link text-black-50"><i class="icon-finish"></i><span>Завершенные проверки</span></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'check:list' %}" class="nav-link text-black-50"><i class="icon-address-book2"></i><span>Контакты</span></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'check:list' %}" class="nav-link text-black-50"><i class="icon-file-check"></i><span>Правила пользования</span></a>
                                 </li>
                             {% else %}
                                 <li class="nav-item"><a class="nav-link disabled">Функции будут доступны после одобрения профиля</a></li>

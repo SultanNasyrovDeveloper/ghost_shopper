@@ -93,7 +93,7 @@ class OrganisationDetailView(LoginRequiredMixin, UserPassesTestMixin, FilterView
         return context
 
     def post(self, request, *args, **kwargs):
-
+        self.object_list = self.get_queryset()
         self.object = get_object_or_404(models.OrganisationTreeNode, id=self.kwargs.get('pk', None))
 
         if self.object.level == 0:
@@ -107,7 +107,7 @@ class OrganisationDetailView(LoginRequiredMixin, UserPassesTestMixin, FilterView
         else:
             context = self.get_context_data()
             context['form'] = form
-            render(request, self.template_name, context)
+            return render(request, self.template_name, context)
 
 
 @method_decorator(staff_member_required, name='dispatch')
@@ -222,10 +222,18 @@ class OrganisationStatisticsView(LoginRequiredMixin, UserPassesTestMixin, Filter
     login_url = reverse_lazy('auth:login')
 
     def test_func(self):
-        """
-        Check if current request user can access this view.
-        """
-        return True
+        user = self.request.user
+        organisation = get_object_or_404(models.OrganisationTreeNode, id=self.kwargs.get('pk', None))
+
+        if user.is_customer:
+            customer_organisation_ids = user.profile.organisation_tree_node.get_descendants_ids()
+            return organisation.id in customer_organisation_ids
+
+        elif user.is_staff:
+            return True
+
+        else:
+            return False
 
     def get(self, request, *args, **kwargs):
         """
@@ -265,8 +273,8 @@ class CreateEmployeeView(LoginRequiredMixin, generic.View):
             return render(request, 'profile/create.html', context)
 
 
-@method_decorator(staff_member_required, name='dispatch')
-class OrganisationDocsListView(LoginRequiredMixin, FilterView):
+
+class OrganisationDocsListView(LoginRequiredMixin, UserPassesTestMixin, FilterView):
     """Organisation documents list view.
     Show list of document objects for given organisation.
 
@@ -276,6 +284,20 @@ class OrganisationDocsListView(LoginRequiredMixin, FilterView):
     filterset_class = filters.OrganisationDocumentFilter
     context_object_name = 'docs'
     paginate_by = 30
+
+    def test_func(self):
+        user = self.request.user
+        organisation = get_object_or_404(models.OrganisationTreeNode, id=self.kwargs.get('pk', None))
+
+        if user.is_customer:
+            customer_organisation_ids = user.profile.organisation_tree_node.get_descendants_ids()
+            return organisation.id in customer_organisation_ids
+
+        elif user.is_staff:
+            return True
+
+        else:
+            return False
 
     def get_queryset(self):
         """Get documents only for current organisation."""

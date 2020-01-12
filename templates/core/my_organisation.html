@@ -1,5 +1,15 @@
 {% extends 'base/base_app.html' %}
 
+
+{% block meta %}
+    <title>Моя организация</title>
+{% endblock %}
+
+
+{% block page-header %}
+    Моя организация
+{% endblock %}
+
 {% block header-buttons %}
     <input type="submit" form="my-organisation-form" value="Сохранить" class="btn btn-primary">
 {% endblock %}

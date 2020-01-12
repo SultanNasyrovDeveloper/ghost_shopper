@@ -5,6 +5,7 @@ from django.views.generic.edit import FormMixin, ProcessFormView
 from django.contrib.auth.models import Group
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.decorators import method_decorator
+from django.forms.models import modelform_factory
 
 from ghost_shopper.auth.decorators import staff_member_required
 
@@ -39,13 +40,25 @@ class CheckKindListView(LoginRequiredMixin, generic.ListView, FormMixin, Process
     form_class = forms.CheckKindForm
     template_name = 'core/check-kind-list.html'
     context_object_name = 'check_kinds'
-    paginate_by = 40
+    paginate_by = 20
     login_url = reverse_lazy('auth:login')
 
     def form_valid(self, form):
         """Redirect user to self if form is valid."""
         form.save()
         return redirect(reverse_lazy('core:check-kind-list'))
+
+
+class CheckKindUpdateView(LoginRequiredMixin, generic.UpdateView):
+    """
+    Update check kind.
+    """
+    model = models.CheckKind
+    template_name = 'core/check_kind_update.html'
+    context_object_name = 'check_kind'
+    form_class = forms.CheckKindForm
+    success_url = reverse_lazy('core:check-kind-list')
+    login_url = reverse_lazy('auth:login')
 
 
 @method_decorator(staff_member_required, name='dispatch')
@@ -66,12 +79,24 @@ class SectionListView(LoginRequiredMixin, generic.ListView, FormMixin, ProcessFo
     form_class = forms.SectionNameForm
     template_name = 'core/section_name_list.html'
     context_object_name = 'sections'
-    paginate_by = 40
+    paginate_by = 20
     login_url = reverse_lazy('auth:login')
 
     def form_valid(self, form):
         form.save()
         return redirect(reverse_lazy('core:section_name_list'))
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class SectionUpdateView(LoginRequiredMixin, generic.UpdateView):
+
+    model = SectionName
+    template_name = 'core/section_name_update.html'
+    context_object_name = 'section_name'
+    form_class = forms.SectionNameForm
+    success_url = reverse_lazy('core:section_name_list')
+    login_url = reverse_lazy('auth:login')
+
 
 
 @method_decorator(staff_member_required, name='dispatch')
@@ -90,7 +115,7 @@ class CityListView(LoginRequiredMixin, generic.ListView, FormMixin, ProcessFormV
     form_class = forms.CityForm
     template_name = 'core/cities_list.html'
     context_object_name = 'cities'
-    paginate_by = 40
+    paginate_by = 20
     login_url = reverse_lazy('auth:login')
 
     def form_valid(self, form):
@@ -129,6 +154,7 @@ class CarBrandDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = 'base/confirm_delete.html'
     success_url = reverse_lazy('core:car-brand-list')
     login_url = reverse_lazy('auth:login')
+    paginate_by = 20
 
 
 @method_decorator(staff_member_required, name='dispatch')
@@ -138,7 +164,7 @@ class CarModelListView(LoginRequiredMixin, generic.ListView, FormMixin, ProcessF
     form_class = forms.CarModelForm
     template_name = 'core/car-model-list.html'
     context_object_name = 'car_models'
-    paginate_by = 40
+    paginate_by = 20
     login_url = reverse_lazy('auth:login')
 
     def get_queryset(self):
@@ -163,62 +189,6 @@ class CarModelDeleteView(LoginRequiredMixin, generic.DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('core:car-model-list', args=(self.object.brand_id, ))
-
-
-@method_decorator(staff_member_required, name='dispatch')
-class GroupListView(LoginRequiredMixin, generic.ListView, generic.FormView):
-
-    model = Group
-    form_class = forms.GroupForm
-    template_name = 'core/group_list.html'
-    context_object_name = 'groups'
-    paginate_by = 20
-    login_url = reverse_lazy('auth:login')
-
-    def form_valid(self, form):
-        group = form.save()
-        return redirect(reverse_lazy('core:group-detail', args=(group.id, )))
-
-
-@method_decorator(staff_member_required, name='dispatch')
-class GroupDetailView(LoginRequiredMixin, generic.DetailView):
-
-    model = Group
-    template_name = 'core/group-detail.html'
-    login_url = reverse_lazy('auth:login')
-
-
-@method_decorator(staff_member_required, name='dispatch')
-class GroupUpdateView(LoginRequiredMixin, generic.UpdateView):
-
-    model = Group
-    form_class = forms.GroupForm
-    template_name = 'core/group_update.html'
-    context_object_name = 'group'
-    login_url = reverse_lazy('auth:login')
-
-    def get_success_url(self):
-        return reverse_lazy('core:group-detail', args=(self.object.id, ))
-
-
-@method_decorator(staff_member_required, name='dispatch')
-class GroupDeleteView(LoginRequiredMixin, generic.DeleteView):
-
-    model = Group
-    template_name = 'base/confirm_delete.html'
-    success_url = reverse_lazy('core:group-list')
-    login_url = reverse_lazy('auth:login')
-
-
-@method_decorator(staff_member_required, name='dispatch')
-class RemoveUserFromGroupView(LoginRequiredMixin, generic.View):
-
-    http_method_names = ('post', )
-    login_url = reverse_lazy('auth:login')
-
-    def post(self, request, *args, **kwargs):
-        group = get_object_or_404(Group, id=kwargs.pop('pk', None))
-        group.user_set.remove()
 
 
 class PerformerLettersTemplateUpdateView(generic.View):

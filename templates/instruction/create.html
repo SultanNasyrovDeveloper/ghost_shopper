@@ -1,6 +1,16 @@
 {% extends 'base/base_app.html' %}
 
 
+{% block meta %}
+    <title>{{ page_name }}</title>
+{% endblock %}
+
+{% block page-header %}
+    <a href="{% url 'instruction:list' %}">Список инструкций</a> /
+    {{ page_name }}
+{% endblock %}
+
+
 {% block header-buttons %}
     <input type="submit" form="instruction-form" value="Сохранить" class="btn btn-primary">
 {% endblock %}

@@ -7,11 +7,13 @@
 {% endblock %}
 
 {% block page-header %}
-    <a href="{% url 'check:list' %}">Список проверок</a> / {{ check.title }}
+    {% if user.is_staff %}
+        <a href="{% url 'check:list' %}">Список проверок</a> /
+    {% endif %}
+    Проверка
 {% endblock %}
 
 {% block header-buttons %}
-
 
     {% if user.is_performer %}{# USER IS PERFORMER #}
 
@@ -136,7 +138,7 @@
             </div>
 
             <div class="row mt-2">  <!-- check deadline -->
-                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Дата окончания:</div>
+                <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Дедлайн:</div>
                 <div class="text-black-50 col-6 col-sm-9">{{ check.deadline }}</div>
             </div>
 
@@ -193,7 +195,7 @@
 
                     {% elif user.is_performer %}
                         {% if user == check.performer %}
-                            {% if check.status == statuses.PROCESSING %}
+                            {% if check.get_status_display == statuses.PROCESSING %}
                                 <a href="{% url 'checklist:update' check.checklist.id %}">Редактировать</a>
                             {% else %}
                                 <a href="{% url 'checklist:detail' check.checklist.id %}">Просмотр</a>
@@ -209,7 +211,14 @@
 
             <div class="row mt-2">  <!-- check instruction -->
                 <div class="text-black-50 col-6 col-sm-3 font-weight-bold">Инструкция:</div>
-                <div class="text-black-50 col-6 col-sm-9"><a href="{{ check.instruction.get_absolute_url }}">Просмотр</a></div>
+                <div class="text-black-50 col-6 col-sm-9">
+                    {% if check.instruction %}
+                        <a href="{{ check.instruction.get_absolute_url }}">Просмотр</a>
+
+                    {% else %}
+                        <span class="text-black-50">Не указана</span>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="row mt-2">  <!-- check curator -->

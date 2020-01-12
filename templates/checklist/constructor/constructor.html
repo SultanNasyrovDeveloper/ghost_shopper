@@ -247,9 +247,7 @@
 
                                         <!-- SUBSECTION QUESTIONS CONTAINER -->
                                         <div>
-
                                             <div class="question-wrapper bg-light p-1 mt-1 mb-1" v-for="question in subsection.questions">
-
                                                 <!-- QUESTION -->
                                                 <div class="question row" >
                                                     <div class="col-4 d-flex align-items-center text-black-50" v-html="question.text"></div>
@@ -387,7 +385,7 @@
 
                         <!-- SECTION BUTTON-->
                         <div class="d-flex justify-content-center m-1">
-                            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#create-section-modal"
+                            <button type="button" class="btn btn-dark mt-2" data-toggle="modal" data-target="#create-section-modal"
                                     :data-section-id="[[ section.id ]]" @click="prepareSectionCreation">
                                 Создать секцию
                             </button>

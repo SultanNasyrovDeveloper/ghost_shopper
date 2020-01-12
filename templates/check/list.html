@@ -124,7 +124,7 @@
                 <div class="results-header row bg-light m-1 p-2" style="border-radius: 3px">
                     <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">ID</div>
                     <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">Статус</div>
-                    <div class="col-3col-md-1 d-flex font-weight-bold text-black-50">Дата начала</div>
+                    <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">Дата начала</div>
                     <div class="col-3 col-md-1 d-flex font-weight-bold text-black-50">Дедлайн</div>
                     <div class="col-12 col-md-3 d-flex font-weight-bold text-black-50">Цель</div>
                     <div class="col-4 col-md-2 d-flex font-weight-bold text-black-50">Тайный покупатель</div>
@@ -136,8 +136,8 @@
                     <a href="{{ check.get_absolute_url }}" class="d-flex row justify-content-between bg-light m-1 p-2 check" style="border-radius: 3px">
                         <div class="col-3 col-md-1 text-black-50">{{ check.id }}</div>
                         <div class="col-3 col-md-1"><span class="badge badge-info">{{ check.get_status_display }}</span></div>
-                        <div class="col-3 col-md-1 text-black-50">{{ check.start_date }}</div>
-                        <div class="col-3 col-md-1 text-black-50">{{ check.deadline }}</div>
+                        <div class="col-3 col-md-1 text-black-50">{{ check.start_date|date:'d.m.Y' }}</div>
+                        <div class="col-3 col-md-1 text-black-50">{{ check.deadline|date:'d.m.Y' }}</div>
                         <div class="col-12 col-md-3 text-black-50">{{ check.target.title }}</div>
                         <div class="col-4 col-md-2 text-black-50">{{ check.performer }}</div>
                         <div class="col-4 col-md-2 text-black-50">{{ check.curator }}</div>

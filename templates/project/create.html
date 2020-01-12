@@ -1,50 +1,48 @@
 {% extends 'base/base_app.html' %}
 {% load static %}
 
+
+{% block meta %}
+    <title>{{ page_name }}</title>
+{% endblock %}
+
 {% block page-header %}
-    Создание нового проекта
+    {{ page_name }}
 {% endblock %}
 
 {% block css %}
     <style>
+
         .select2-container{
-            width: 100% !important;
+            width: 100%;
+            min-width: 100% !important;
         }
 
-        .select2-selection--single{
-            background-clip: border-box;
-            border: 1px solid #ddd !important;
-            border-top-color: transparent!important;
+        .select2-selection--multiple, .select2-selection--single{
+            border: none !important;
+            border-bottom: 1px solid #ddd!important;
             border-radius: 0!important;
+            display: flex;
+            align-items: center;
 
-
-            height: 40px !important;
-            width: 100% !important;
-        }
-
-        .select2-dropdown--below{
-            width: 50vw;
+            height: auto!important;
         }
 
         .select2-search--dropdown:after{
-            display: none;
-        }
-
-        .select2-selection__arrow{
             display: none;
         }
     </style>
 {% endblock %}
 
 {% block header-buttons %}
-    <input class="btn btn-info" type="submit" value="Сохранить" form="project-form">
+    <input class="btn btn-primary" type="submit" value="Сохранить" form="project-form">
 
 {% endblock %}
 
 
 {% block content %}
     <div class="card">
-        <div class="card-header"><h2>Создать проект</h2></div>
+        <div class="card-header"><h2 class="font-weight-bold text-black-50">{{ page_name }}</h2></div>
         <div class="card-body">
             <form method="post" id="project-form">
                 {% csrf_token %}

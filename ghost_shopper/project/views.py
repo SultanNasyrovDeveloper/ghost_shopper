@@ -33,7 +33,8 @@ class ProjectCreateView(LoginRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         context = {
             'project_form': ProjectForm(prefix='project'),
-            'check_template_form': ProjectCheckTemplateForm(prefix='check')
+            'check_template_form': ProjectCheckTemplateForm(prefix='check'),
+            'page_name': 'Создать проект'
         }
         return render(request, 'project/create.html', context)
 
@@ -80,7 +81,8 @@ class ProjectUpdateView(LoginRequiredMixin, generic.UpdateView):
         check_template = project.get_check_template()
         context = {
             'project_form': ProjectForm(prefix='project', instance=project),
-            'check_template_form': ProjectCheckTemplateForm(prefix='check', instance=check_template)
+            'check_template_form': ProjectCheckTemplateForm(prefix='check', instance=check_template),
+            'page_name': 'Редактировать проект'
         }
         return render(request, 'project/create.html', context)
 

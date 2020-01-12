@@ -1,13 +1,14 @@
 {% extends 'base/base_app.html' %}
 
 
-{% block page-header %}
-    {% if instruction.check_obj.project %}
-        <a href="{{ instruction.check_obj.project.get_absolute_url }}">Проект {{ instruction.check_obj.project.name }}</a> / Инструкция
-    {% else %}
-        <a href="{{ instruction.check_obj.get_absolute_url }}">{{ instruction.check_obj.title }}</a> / Инструкция
-    {% endif %}
+{% block meta %}
+    <title>{{ instruction.name }}</title>
+{% endblock %}
 
+
+{% block page-header %}
+        <a href="{% url 'instruction:list' %}">Список инструкций</a> /
+        Страница инструкции
 {% endblock %}
 
 

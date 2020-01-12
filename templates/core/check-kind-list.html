@@ -25,16 +25,14 @@
                         <div class="d-flex col justify-content-between bg-light m-1 p-2">
                             <div class="col-6 font-weight-bold text-black-50">{{ kind.name }}</div>
                             <div class="col-4 font-weight-bold text-black-50">{{ kind.price }} руб.</div>
-                            <div class="col-2"><a href="{% url 'core:check-kind-delete' kind.id %}"><i class="icon-trash text-danger-400"></i></a></div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="col">
-                    {% for kind in cehck_kinds|slice:"21:41" %}
-                        <div class="d-flex col justify-content-between bg-light m-1 p-2">
-                            <div class="col-6 font-weight-bold text-black-50">{{ kind.name }}</div>
-                            <div class="col-4 font-weight-bold text-black-50">{{ kind.price }} руб.</div>
-                            <div class="col-2"><a href="{% url 'core:check-kind-delete' kind.id %}"><i class="icon-trash text-danger-400"></i></a></div>
+                            <div class="col-2">
+                                <a href="{% url 'core:check-kind-update' kind.id %}">
+                                    <i class="icon-pencil4 mr-2 text-black-50"></i>
+                                </a>
+                                <a href="{% url 'core:check-kind-delete' kind.id %}">
+                                    <i class="icon-trash text-danger-400"></i>
+                                </a>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>

@@ -1,5 +1,8 @@
 from django.db import models
 from django.shortcuts import reverse
+from django.db.models.signals import post_save
+
+from ghost_shopper.check.models import Check
 
 
 class Instruction(models.Model):
@@ -12,5 +15,4 @@ class Instruction(models.Model):
 
     def __str__(self):
         return self.name
-
 

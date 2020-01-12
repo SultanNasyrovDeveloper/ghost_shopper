@@ -32,6 +32,11 @@ class InstructionCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = InstructionForm
     login_url = reverse_lazy('auth:login')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = 'Создать инструкцию'
+        return context
+
     def form_valid(self, form):
         instruction = form.save()
         return redirect(reverse_lazy('instruction:detail', args=(instruction.id, )))
@@ -69,6 +74,11 @@ class InstructionUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Instruction
     template_name = 'instruction/create.html'
     form_class = InstructionForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_name'] = 'Редактировать инструкцию'
+        return context
 
 
 @method_decorator(staff_member_required, name='dispatch')

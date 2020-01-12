@@ -18,9 +18,10 @@ class CheckFilterSet(filters.FilterSet):
     end_date = filters.DateFromToRangeFilter(widget=RangeWidget(attrs={'class': 'form-control pickadate mr-1 ml-1'}))
     curator = filters.ModelChoiceFilter(
         queryset=User.objects.filter(is_staff=True), widget=forms.Select(attrs={'class': 'form-control'}))
-    target = filters.CharFilter(widget=ac.ListSelect2(url=reverse_lazy('organisation:autocomplete-node'), attrs={
-        'class': 'form-control', 'data-placeholder': 'Организация'
-    }))
+    target = filters.CharFilter(widget=ac.ListSelect2(
+        url=reverse_lazy('organisation:autocomplete-node'),
+        attrs={'class': 'form-control', 'data-placeholder': 'Организация'}
+    ))
 
     class Meta:
         model = Check
