@@ -7,10 +7,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'mvmnrp%5xlvwfi-tq+a09*0yd*)61s36tq37mv7v838*=9cc!)'
 
 
-DEBUG = True
+DEBUG = False
 
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['45.129.3.200']
 
 
 INSTALLED_APPS = [
@@ -46,7 +45,6 @@ INSTALLED_APPS = [
 
 
 SITE_ID = 1
-
 SUMMERNOTE_THEME = 'bs4'
 SUMMERNOTE_CONFIG = {
     'disable_attachment': True
@@ -67,6 +65,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'ghost_shopper.urls'
 
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -82,7 +81,7 @@ TEMPLATES = [
                 'ghost_shopper.user_profile.context_processors.approval_requests_number',
                 'ghost_shopper.check.context_processors.available_checks_number',
                 'ghost_shopper.check.context_processors.current_checks_number',
-                'ghost_shopper.index_page.context_processors.index_page',
+                'ghost_shopper.index_page.context_processors.index_page'
             ],
         },
     },
@@ -90,7 +89,6 @@ TEMPLATES = [
 
 SESSION_COOKIE_AGE = 60 * 60
 SESSION_SAVE_EVERY_REQUEST = True
-
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
@@ -108,8 +106,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ghost_shopper',
-        'USER': 'developer',
-        'PASSWORD': '123456',
+        'USER': 'ghost_shopper',
+        'PASSWORD': 'dkjcndsknO849bnf[qfeoc039uhfDD',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -131,7 +129,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 AUTH_USER_MODEL = 'user_profile.User'
 
@@ -155,8 +152,7 @@ CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
