@@ -45,6 +45,11 @@
                         {% endif %}
                     </div>
                 {% endfor %}
+
+                {% for field in form.hidden_fields %}
+                    {{ field }}
+                {% endfor %}
+
             </form>
         </div>
     </div><!-- /FORM -->
